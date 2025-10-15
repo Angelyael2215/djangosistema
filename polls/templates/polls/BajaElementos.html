@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>Baja Trabajadores - Orticorp</title>
+	<style>
+		body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#d3d3d3; }
+		.panel { max-width:1100px; margin:30px auto; background:#e9e9e9; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); }
+		.panel header { background:#cfcfcf; padding:20px 26px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #999; }
+		.panel header h1 { margin:0; font-size:1.6rem; }
+		.panel .nav { background:#d9d9d9; padding:12px 26px; display:flex; gap:8px; }
+		.nav a { text-decoration:none; background:#fff; border:1px solid #bdbdbd; padding:8px 16px; border-radius:6px; color:#222; }
+		.content { padding:28px; }
+		.card { background:#fff; border:1px solid #bdbdbd; padding:22px; border-radius:4px; }
+		.form-grid { display:flex; gap:24px; }
+		.form-group { flex:1; display:flex; flex-direction:column; }
+		label { font-weight:700; font-size:0.92rem; margin-bottom:8px; }
+		input[type=text], select, input[type=date] { padding:8px 10px; border:1px solid #cfcfcf; border-radius:4px; background:#fbfbfb; }
+		.row { display:flex; gap:24px; }
+		.center { display:flex; justify-content:center; }
+		@media (max-width:800px) { .form-grid, .row { flex-direction:column; } }
+	</style>
+</head>
+<body>
+	<div class="panel">
+		<header>
+			<div><h1>Baja<br><small style="font-weight:600;color:#333">Trabajadores</small></h1></div>
+			<div><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="logo" style="width:64px"></div>
+		</header>
+		<nav class="nav">
+			<a href="/inicio/">Inicio</a>
+			<a href="/registro/">Registro</a>
+			<a href="/baja/">Baja de Elementos</a>
+		</nav>
+		<div class="content">
+			<div class="card">
+				<form method="post">
+					<div class="form-grid">
+						<div class="form-group">
+							<label for="id_trabajador">ID Del Trabajador:</label>
+							<input id="id_trabajador" name="id_trabajador" type="text" placeholder="Value">
+						</div>
+						<div class="form-group">
+							<label for="motivo">Motivo de Baja:</label>
+							<select id="motivo" name="motivo">
+								<option value="">Seleccionar motivo</option>
+								<option value="renuncia">Renuncia</option>
+								<option value="despido">Despido</option>
+								<option value="termino">Término de contrato</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="fecha">Fecha de Baja:</label>
+							<input id="fecha" name="fecha" type="date">
+						</div>
+					</div>
+					<div style="height:18px"></div>
+					<div class="row">
+						<div class="center" style="flex:1">
+							<button type="submit" style="padding:10px 22px;border-radius:6px;border:1px solid #999;background:#1a3e8a;color:#fff;cursor:pointer">Confirmar Baja</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
