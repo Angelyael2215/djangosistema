@@ -48,7 +48,11 @@
         <h2>ORTIZCORP</h2>
         <p>Seguridad Integral</p>
         <form method="post">
-            <input type="text" name="username" placeholder="Usuario" required><br>
+            {% csrf_token %}
+            {% if messages %}
+                <div style="margin-bottom:8px;color:#800">{% for message in messages %}{{ message }}<br>{% endfor %}</div>
+            {% endif %}
+            <input type="email" name="username" placeholder="Correo electrónico" required><br>
             <input type="password" name="password" placeholder="Contraseña" required>
             <button type="submit">Iniciar Sesion</button>
         </form>
