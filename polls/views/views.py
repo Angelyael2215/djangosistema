@@ -4,7 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from ..models import Trabajador, Servicio, Documentos, Horarios
 from ..models import CustomUser
+from ..forms import TrabajadorRegistroForm, DocumentosForm
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
+import os
 
 def is_admin(user):
     return user.role == 'ADMIN'
@@ -119,3 +122,100 @@ def editar_trabajador(request, trabajador_id):
         return redirect('inicio')
     
     return render(request, 'polls/editar_trabajador.html', {'trabajador': trabajador})
+
+@user_passes_test(is_hr_or_admin)
+def registrar_trabajador(request):
+    """Vista para registrar un nuevo trabajador con documentos"""
+    if request.method == 'POST':
+        # Crear trabajador a partir de los campos principales (y campos adicionales)
+        nombre = request.POST.get('nombre')
+        apellido_paterno = request.POST.get('apellido_paterno')
+        apellido_materno = request.POST.get('apellido_materno')
+        estado = request.POST.get('estado', 'Activo')
+        rfc = request.POST.get('rfc')
+        no_exterior = request.POST.get('no_exterior')
+        curp_text = request.POST.get('curp_text')
+        codigo_postal = request.POST.get('codigo_postal')
+        cuip_text = request.POST.get('cuip_text')
+        entidad_federativa = request.POST.get('entidad_federativa')
+        nss_text = request.POST.get('nss_text')
+        calle = request.POST.get('calle')
+        horario = request.POST.get('horario')
+        calle_servicio = request.POST.get('calle_servicio')
+        no_exterior_servicio = request.POST.get('no_exterior_servicio')
+        entidad_servicio = request.POST.get('entidad_servicio')
+        estado_servicio = request.POST.get('estado_servicio')
+
+        if not nombre:
+            messages.error(request, 'El nombre es obligatorio.')
+            return render(request, 'polls/registro.html')
+
+        trabajador = Trabajador.objects.create(
+            nombre=nombre,
+            apellido=apellido_paterno,
+            apellido_materno=apellido_materno,
+            estado=estado,
+            rfc=rfc,
+            no_exterior=no_exterior,
+            curp_text=curp_text,
+            codigo_postal=codigo_postal,
+            cuip_text=cuip_text,
+            entidad_federativa=entidad_federativa,
+            nss_text=nss_text,
+            calle=calle,
+            horario=horario,
+            calle_servicio=calle_servicio,
+            no_exterior_servicio=no_exterior_servicio,
+            entidad_servicio=entidad_servicio,
+            estado_servicio=estado_servicio,
+        )
+
+        # Asegurar que la carpeta exista antes de guardar archivos
+        carpeta = os.path.join(settings.MEDIA_ROOT, 'documentos', str(trabajador.id))
+        os.makedirs(carpeta, exist_ok=True)
+
+        # Crear registro de Documentos y asignar archivos si existen
+        documentos = Documentos(trabajador=trabajador)
+        file_fields = ['cuip', 'antecedentes', 'situacion_fiscal', 'curp', 'nss', 'cursos', 'certificado_estudios']
+        for f in file_fields:
+            uploaded = request.FILES.get(f)
+            if uploaded:
+                setattr(documentos, f, uploaded)
+
+        documentos.save()
+
+        messages.success(request, f'Trabajador {trabajador.nombre} registrado y archivos guardados.')
+        return redirect('inicio')
+
+    # GET -> mostrar plantilla con diseño existente
+    return render(request, 'polls/registro.html')
+
+@user_passes_test(is_hr_or_admin)
+def agregar_documentos(request, trabajador_id):
+    """Vista para agregar documentos a un trabajador"""
+    try:
+        trabajador = Trabajador.objects.get(id=trabajador_id)
+    except Trabajador.DoesNotExist:
+        messages.error(request, 'Trabajador no encontrado.')
+        return redirect('inicio')
+    
+    # Obtener o crear registro de documentos
+    documentos, created = Documentos.objects.get_or_create(trabajador=trabajador)
+    
+    if request.method == 'POST':
+        form = DocumentosForm(request.POST, request.FILES, instance=documentos)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Documentos del trabajador {trabajador.nombre} guardados exitosamente.')
+            return redirect('inicio')
+        else:
+            messages.error(request, 'Error al guardar los documentos.')
+    else:
+        form = DocumentosForm(instance=documentos)
+    
+    context = {
+        'form': form,
+        'trabajador': trabajador,
+        'documentos': documentos
+    }
+    return render(request, 'polls/agregar_documentos.html', context)

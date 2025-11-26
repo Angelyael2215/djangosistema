@@ -2,6 +2,11 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+import os
+
+def documentos_path(instance, filename):
+	"""Genera la ruta para almacenar documentos por ID de trabajador"""
+	return os.path.join('documentos', str(instance.trabajador.id), filename)
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -40,7 +45,22 @@ class CustomUser(AbstractUser):
 
 class Trabajador(models.Model):
 	nombre = models.CharField(max_length=128)
+	# mantenemos `apellido` como apellido paterno para compatibilidad
 	apellido = models.CharField(max_length=128, blank=True, null=True)
+	apellido_materno = models.CharField(max_length=128, blank=True, null=True)
+	rfc = models.CharField(max_length=64, blank=True, null=True)
+	no_exterior = models.CharField(max_length=64, blank=True, null=True)
+	curp_text = models.CharField(max_length=128, blank=True, null=True)
+	codigo_postal = models.CharField(max_length=16, blank=True, null=True)
+	cuip_text = models.CharField(max_length=128, blank=True, null=True)
+	entidad_federativa = models.CharField(max_length=128, blank=True, null=True)
+	nss_text = models.CharField(max_length=128, blank=True, null=True)
+	calle = models.CharField(max_length=256, blank=True, null=True)
+	horario = models.CharField(max_length=64, blank=True, null=True)
+	calle_servicio = models.CharField(max_length=256, blank=True, null=True)
+	no_exterior_servicio = models.CharField(max_length=64, blank=True, null=True)
+	entidad_servicio = models.CharField(max_length=128, blank=True, null=True)
+	estado_servicio = models.CharField(max_length=64, blank=True, null=True)
 	fecha_ingreso = models.DateTimeField(default=timezone.now)
 	estado = models.CharField(max_length=64, default="Activo", blank=True, null=True)
 
@@ -59,13 +79,13 @@ class Servicio(models.Model):
 
 class Documentos(models.Model):
 	trabajador = models.ForeignKey(Trabajador, on_delete=models.CASCADE, related_name="documentos")
-	cuip = models.CharField(max_length=128)
-	antecedentes = models.CharField(max_length=128)
-	situacion_fiscal = models.CharField(max_length=128)
-	curp = models.CharField(max_length=128)
-	nss = models.CharField(max_length=128)
-	cursos = models.CharField(max_length=128)
-	certificado_estudios = models.CharField(max_length=128)
+	cuip = models.FileField(upload_to=documentos_path, blank=True, null=True)
+	antecedentes = models.FileField(upload_to=documentos_path, blank=True, null=True)
+	situacion_fiscal = models.FileField(upload_to=documentos_path, blank=True, null=True)
+	curp = models.FileField(upload_to=documentos_path, blank=True, null=True)
+	nss = models.FileField(upload_to=documentos_path, blank=True, null=True)
+	cursos = models.FileField(upload_to=documentos_path, blank=True, null=True)
+	certificado_estudios = models.FileField(upload_to=documentos_path, blank=True, null=True)
 
 	def __str__(self):
 		return f"Documentos de {self.trabajador}"

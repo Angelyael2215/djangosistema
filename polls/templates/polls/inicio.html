@@ -173,8 +173,10 @@
         </header>
         <nav class="dashboard-nav">
             <a class="nav-btn" href="/inicio/">Inicio</a>
-            <a class="nav-btn" href="/registro/">Registro</a>
-            <a class="nav-btn" href="/baja/">Baja de Elementos</a>
+            {% if can_edit %}
+                <a class="nav-btn" href="{% url 'registrar_trabajador' %}">Registrar Trabajador</a>
+                <a class="nav-btn" href="/baja/">Baja de Elementos</a>
+            {% endif %}
             <div class="filter-dropdown">
                 <button class="filter-btn" id="filterBtn">Filtrar ▼</button>
                 <div class="filter-menu" id="filterMenu">
