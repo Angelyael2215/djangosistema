@@ -1,68 +1,389 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
-	<title>Baja Trabajadores - Orticorp</title>
-	<style>
-		body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:#d3d3d3; }
-		.panel { max-width:1100px; margin:30px auto; background:#e9e9e9; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); }
-		.panel header { background:#cfcfcf; padding:20px 26px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #999; }
-		.panel header h1 { margin:0; font-size:1.6rem; }
-		.panel .nav { background:#d9d9d9; padding:12px 26px; display:flex; gap:8px; }
-		.nav a { text-decoration:none; background:#fff; border:1px solid #bdbdbd; padding:8px 16px; border-radius:6px; color:#222; }
-		.content { padding:28px; }
-		.card { background:#fff; border:1px solid #bdbdbd; padding:22px; border-radius:4px; }
-		.form-grid { display:flex; gap:24px; }
-		.form-group { flex:1; display:flex; flex-direction:column; }
-		label { font-weight:700; font-size:0.92rem; margin-bottom:8px; }
-		input[type=text], select, input[type=date] { padding:8px 10px; border:1px solid #cfcfcf; border-radius:4px; background:#fbfbfb; }
-		.row { display:flex; gap:24px; }
-		.center { display:flex; justify-content:center; }
-		@media (max-width:800px) { .form-grid, .row { flex-direction:column; } }
-	</style>
+    <meta charset="UTF-8">
+    <title>Baja de Trabajadores - Ortizcorp</title>
+    <link rel="stylesheet" href="{% static 'polls/css/theme.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f2f2f2;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #222;
+        }
+        .container {
+            max-width: 1150px;
+            margin: 24px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        /* Header: light gray like the screenshot */
+        .header {
+            background: #d0d0d0;
+            color: #111;
+            padding: 28px 32px;
+            text-align: left;
+        }
+        .header h1 {
+            font-size: 1.9rem;
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 1rem;
+            opacity: 0.85;
+        }
+
+        /* Nav buttons: white with purple border and purple text */
+        .nav {
+            background: #efefef;
+            padding: 14px 32px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .nav a {
+            padding: 10px 16px;
+            background: #ffffff;
+            border: 2px solid #7b1fa2; /* purple */
+            border-radius: 8px;
+            text-decoration: none;
+            color: #7b1fa2;
+            font-weight: 600;
+            transition: all 0.18s ease-in-out;
+        }
+        .nav a:hover {
+            background: #7b1fa2;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .content {
+            padding: 30px 36px;
+        }
+        .messages {
+            margin-bottom: 18px;
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+        }
+        .alert-success {
+            background: #e9f7ef;
+            color: #145a32;
+            border-left-color: #27ae60;
+        }
+        .alert-error {
+            background: #fdecea;
+            color: #7a1a1a;
+            border-left-color: #e74c3c;
+        }
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e6edf7;
+            margin-bottom: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        /* Table header: soft blue */
+        th {
+            background: #eaf3ff;
+            color: #12324a;
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 1px solid #e6edf7;
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #2b3a42;
+        }
+        tr:hover {
+            background: #fbfdff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.92rem;
+            transition: all 0.16s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: 2px solid transparent;
+            background: transparent;
+        }
+        /* Baja button: white with purple border/text */
+        .btn-baja {
+            background: #ffffff;
+            border: 2px solid #7b1fa2;
+            color: #7b1fa2;
+            font-weight: 700;
+        }
+        .btn-baja:hover {
+            background: #7b1fa2;
+            color: #fff;
+        }
+        /* View documents: similar style */
+        .btn-view {
+            background: #ffffff;
+            border: 2px solid #2b6ea3; /* muted blue */
+            color: #2b6ea3;
+            font-weight: 700;
+        }
+        .btn-view:hover {
+            background: #2b6ea3;
+            color: #fff;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.36);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #ffffff;
+            padding: 22px 22px;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(11,22,38,0.15);
+            max-width: 520px;
+            width: 92%;
+        }
+        .modal-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #7b1fa2;
+        }
+        .modal-body {
+            margin-bottom: 14px;
+        }
+        .modal-body p {
+            margin-bottom: 12px;
+            color: #444;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e1e7ee;
+            border-radius: 6px;
+            font-size: 0.98rem;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            min-height: 80px;
+        }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+            padding: 10px 18px;
+            border: 1px solid #d0d0d0;
+            border-radius: 8px;
+        }
+        .btn-cancel:hover {
+            background: #e6e6e6;
+        }
+        .btn-confirm {
+            background: #7b1fa2;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 2px solid #7b1fa2;
+        }
+        .btn-confirm:hover {
+            background: #5e157f;
+            border-color: #5e157f;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 36px;
+            color: #7a7a7a;
+        }
+        .empty-state p {
+            font-size: 1.05rem;
+            margin-bottom: 10px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .status-activo {
+            background: #eaf3ff;
+            color: #1b4f7a;
+        }
+        .status-inactivo {
+            background: #fbecec;
+            color: #832029;
+        }
+    </style>
 </head>
 <body>
-	<div class="panel">
-		<header>
-			<div><h1>Baja<br><small style="font-weight:600;color:#333">Trabajadores</small></h1></div>
-			<div><img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="logo" style="width:64px"></div>
-		</header>
-		<nav class="nav">
-			<a href="/inicio/">Inicio</a>
-			<a href="/registro/">Registro</a>
-			<a href="/baja/">Baja de Elementos</a>
-		</nav>
-		<div class="content">
-			<div class="card">
-				<form method="post">
-					<div class="form-grid">
-						<div class="form-group">
-							<label for="id_trabajador">ID Del Trabajador:</label>
-							<input id="id_trabajador" name="id_trabajador" type="text" placeholder="Value">
-						</div>
-						<div class="form-group">
-							<label for="motivo">Motivo de Baja:</label>
-							<select id="motivo" name="motivo">
-								<option value="">Seleccionar motivo</option>
-								<option value="renuncia">Renuncia</option>
-								<option value="despido">Despido</option>
-								<option value="termino">Término de contrato</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="fecha">Fecha de Baja:</label>
-							<input id="fecha" name="fecha" type="date">
-						</div>
-					</div>
-					<div style="height:18px"></div>
-					<div class="row">
-						<div class="center" style="flex:1">
-							<button type="submit" style="padding:10px 22px;border-radius:6px;border:1px solid #999;background:#1a3e8a;color:#fff;cursor:pointer">Confirmar Baja</button>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <div class="header">
+            <h1>Baja de Trabajadores</h1>
+            <p>Gestiona la baja de trabajadores en el sistema</p>
+        </div>
+
+        <div class="nav">
+            <a href="/inicio/">Inicio</a>
+            <a href="/registro/">Registrar Trabajador</a>
+            <a href="/baja/">Baja de Elementos</a>
+        </div>
+
+        <div class="content">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}success{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if trabajadores %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellido Paterno</th>
+                                <th>RFC</th>
+                                <th>Horario</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trabajador in trabajadores %}
+                                <tr>
+                                    <td>#{{ trabajador.id }}</td>
+                                    <td>{{ trabajador.nombre }}</td>
+                                    <td>{{ trabajador.apellido|default:"-" }}</td>
+                                    <td>{{ trabajador.rfc|default:"-" }}</td>
+                                    <td>{{ trabajador.horario|default:"-" }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ trabajador.estado|lower }}">
+                                            {{ trabajador.estado }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-baja" onclick="abrirModal({{ trabajador.id }}, '{{ trabajador.nombre }} {{ trabajador.apellido }}')">
+                                                Dar de Baja
+                                            </button>
+                                            <a href="{% url 'agregar_documentos' trabajador.id %}" class="btn btn-view">
+                                                Ver Documentos
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>No hay trabajadores activos para dar de baja.</p>
+                    <p><a href="{% url 'registro' %}" style="color: #3498db; text-decoration: none;">Registrar un nuevo trabajador</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de baja -->
+    <div id="bajaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirmar Baja de Trabajador
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas dar de baja a este trabajador?</p>
+                <p id="trabajadorInfo" style="font-weight: bold; color: #c0392b;"></p>
+                <form id="bajaForm" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="trabajadorId" name="trabajador_id">
+                    <div class="form-group">
+                        <label for="motivo">Motivo de la baja (opcional):</label>
+                        <textarea name="motivo" id="motivo" placeholder="Ingrese el motivo de la baja..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn btn-confirm" onclick="confirmarBaja()">Confirmar Baja</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModal(id, nombre) {
+            document.getElementById('trabajadorId').value = id;
+            document.getElementById('trabajadorInfo').textContent = 'Trabajador: ' + nombre;
+            document.getElementById('bajaModal').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('bajaModal').classList.remove('active');
+            document.getElementById('motivo').value = '';
+        }
+
+        function confirmarBaja() {
+            document.getElementById('bajaForm').submit();
+        }
+
+        // Cerrar modal si hace clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('bajaModal');
+            if (event.target === modal) {
+                cerrarModal();
+            }
+        }
+    </script>
 </body>
 </html>

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from ..models import Trabajador, Servicio, Documentos, Horarios
+from ..models import Trabajador, Servicio, Documentos, Horarios, Auditoria
 from ..models import CustomUser
 from ..forms import TrabajadorRegistroForm, DocumentosForm
 from django.core.exceptions import PermissionDenied
@@ -10,10 +10,10 @@ from django.conf import settings
 import os
 
 def is_admin(user):
-    return user.role == 'ADMIN'
+    return getattr(user, 'role', None) == 'ADMIN'
 
 def is_hr_or_admin(user):
-    return user.role in ['HR', 'ADMIN']
+    return getattr(user, 'role', None) in ['HR', 'ADMIN']
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -71,18 +71,90 @@ def register_view(request):
 
 @user_passes_test(is_hr_or_admin)
 def baja_view(request):
+    """Vista para dar de baja a trabajadores"""
     if request.method == 'POST':
         trabajador_id = request.POST.get('trabajador_id')
+        motivo = request.POST.get('motivo', '')
+        
         try:
             trabajador = Trabajador.objects.get(id=trabajador_id)
+            estado_anterior = trabajador.estado
+            
+            # Cambiar estado a Inactivo
             trabajador.estado = 'Inactivo'
             trabajador.save()
-            messages.success(request, f'El trabajador {trabajador.nombre} ha sido dado de baja.')
+            
+            # Registrar auditoría
+            Auditoria.objects.create(
+                trabajador=trabajador,
+                usuario=request.user,
+                accion='BAJA',
+                estado_anterior=estado_anterior,
+                estado_nuevo='Inactivo',
+                motivo=motivo
+            )
+            
+            messages.success(request, f'El trabajador {trabajador.nombre} {trabajador.apellido} ha sido dado de baja exitosamente.')
+            return redirect('baja')
         except Trabajador.DoesNotExist:
             messages.error(request, 'Trabajador no encontrado.')
             
+    # GET -> mostrar formulario de baja
     trabajadores = Trabajador.objects.filter(estado='Activo')
-    return render(request, 'polls/BajaElementos.html', {'trabajadores': trabajadores})
+    context = {
+        'trabajadores': trabajadores
+    }
+    return render(request, 'polls/BajaElementos.html', context)
+
+@user_passes_test(is_hr_or_admin)
+def reactivar_trabajador(request, trabajador_id):
+    """Vista para reactivar un trabajador"""
+    try:
+        trabajador = Trabajador.objects.get(id=trabajador_id)
+        estado_anterior = trabajador.estado
+        
+        trabajador.estado = 'Activo'
+        trabajador.save()
+        
+        # Registrar auditoría
+        Auditoria.objects.create(
+            trabajador=trabajador,
+            usuario=request.user,
+            accion='REACTIVACION',
+            estado_anterior=estado_anterior,
+            estado_nuevo='Activo',
+            motivo='Reactivación de trabajador'
+        )
+        
+        messages.success(request, f'El trabajador {trabajador.nombre} ha sido reactivado exitosamente.')
+    except Trabajador.DoesNotExist:
+        messages.error(request, 'Trabajador no encontrado.')
+    
+    return redirect('baja')
+
+@user_passes_test(is_admin)
+def historial_auditoria(request):
+    """Vista para ver el historial de auditoría"""
+    auditorias = Auditoria.objects.all()
+    
+    # Filtros opcionales
+    trabajador_id = request.GET.get('trabajador_id')
+    accion = request.GET.get('accion')
+    
+    if trabajador_id:
+        auditorias = auditorias.filter(trabajador_id=trabajador_id)
+    if accion:
+        auditorias = auditorias.filter(accion=accion)
+    
+    trabajadores = Trabajador.objects.all()
+    acciones = Auditoria.objects.values_list('accion', flat=True).distinct()
+    
+    context = {
+        'auditorias': auditorias,
+        'trabajadores': trabajadores,
+        'acciones': acciones
+    }
+    return render(request, 'polls/historial_auditoria.html', context)
 
 @login_required
 def logout_view(request):

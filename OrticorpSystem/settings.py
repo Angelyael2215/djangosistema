@@ -75,16 +75,44 @@ WSGI_APPLICATION = 'OrticorpSystem.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
+    # MySQL local (configured to run in Workbench-like environment)
+    # Base de conexión actual: MySQL en localhost con usuario root
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'orticorpsystem',
-        'USER': 'Admin',
-        'PASSWORD': 'orticorp2209',
-        'HOST': '192.168.1.124',
+        'USER': 'root',
+        'PASSWORD': 'Montes11*',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
-    
 }
+
+
+# -----------------------------
+# base de orticorp (documentación)
+# -----------------------------
+# Conexiones previas guardadas para referencia / rollback
+#
+# 1) SQLite local (rápido para desarrollo)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+#
+# 2) MySQL remota (config anterior)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'orticorpsystem',
+#         'USER': 'Admin',
+#         'PASSWORD': 'orticorp2209',
+#         'HOST': '192.168.1.124',
+#         'PORT': '3306',
+#     }
+# }
+
 
 
 # Password validation
