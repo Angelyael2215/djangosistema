@@ -37,8 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'OrticorpSystem',
-    'polls',
 ]
 
 MIDDLEWARE = [
@@ -75,44 +73,16 @@ WSGI_APPLICATION = 'OrticorpSystem.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    # MySQL local (configured to run in Workbench-like environment)
-    # Base de conexión actual: MySQL en localhost con usuario root
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'orticorpsystem',
-        'USER': 'root',
-        'PASSWORD': 'Montes11*',
-        'HOST': 'localhost',
+        'USER': 'Admin',
+        'PASSWORD': 'orticorp2209',
+        'HOST': '192.168.1.124',
         'PORT': '3306',
     }
+    
 }
-
-
-# -----------------------------
-# base de orticorp (documentación)
-# -----------------------------
-# Conexiones previas guardadas para referencia / rollback
-#
-# 1) SQLite local (rápido para desarrollo)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-#
-# 2) MySQL remota (config anterior)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'orticorpsystem',
-#         'USER': 'Admin',
-#         'PASSWORD': 'orticorp2209',
-#         'HOST': '192.168.1.124',
-#         'PORT': '3306',
-#     }
-# }
-
 
 
 # Password validation
@@ -151,19 +121,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Media files (User uploads)
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Custom user model
-AUTH_USER_MODEL = 'polls.CustomUser'
-
-# Login URL
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'inicio'
-LOGOUT_REDIRECT_URL = 'login'
