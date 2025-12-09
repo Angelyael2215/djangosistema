@@ -1,0 +1,51 @@
+/* Theme: Gris / Morado / Azul suave - shared styles for Orticorp views */
+:root{
+    --bg-page: #f2f2f2;
+    --card-bg: #ffffff;
+    --header-bg: #d0d0d0; /* light gray */
+    --accent-purple: #7b1fa2;
+    --accent-blue: #2b6ea3;
+    --table-head: #eaf3ff; /* soft blue */
+    --text-strong: #111827;
+    --muted: #7a7a7a;
+}
+/* Base */
+body{ background:var(--bg-page) !important; font-family: 'Segoe UI', Arial, sans-serif; color:var(--text-strong); }
+.container, .dashboard-container{ background:var(--card-bg) !important; }
+
+/* Header */
+.header, .dashboard-header{ background:var(--header-bg) !important; color:var(--text-strong) !important; }
+.header h1, .dashboard-header h2{ color:var(--text-strong) !important; }
+
+/* Nav buttons */
+.nav a, .nav-btn{ background:#fff !important; border:2px solid var(--accent-purple) !important; color:var(--accent-purple) !important; border-radius:8px; padding:8px 14px; font-weight:700; text-decoration:none; }
+.nav a:hover, .nav-btn:hover{ background:var(--accent-purple) !important; color:#fff !important; }
+
+/* Tables */
+.table-container table th{ background:var(--table-head) !important; color:#12324a !important; font-weight:700 !important; }
+.table-container table td{ color:#233238 !important; }
+
+/* Buttons */
+.btn-baja{ background:#fff !important; border:2px solid var(--accent-purple) !important; color:var(--accent-purple) !important; font-weight:700; }
+.btn-baja:hover{ background:var(--accent-purple) !important; color:#fff !important; }
+.btn-view{ background:#fff !important; border:2px solid var(--accent-blue) !important; color:var(--accent-blue) !important; font-weight:700; }
+.btn-view:hover{ background:var(--accent-blue) !important; color:#fff !important; }
+.btn-confirm{ background:var(--accent-purple) !important; border:2px solid var(--accent-purple) !important; color:#fff !important; }
+
+/* Badges */
+.status-activo{ background:#eaf3ff !important; color:#1b4f7a !important; font-weight:700; }
+.status-inactivo{ background:#fbecec !important; color:#832029 !important; font-weight:700; }
+
+/* Modals */
+.modal-content{ border-radius:10px !important; }
+.modal-header{ color:var(--accent-purple) !important; }
+
+/* Forms and links */
+.back-link{ color:var(--accent-blue) !important; }
+.back-link:hover{ text-decoration:underline; }
+
+/* Small helpers */
+.empty-state{ color:var(--muted) !important; }
+
+/* Ensure high specificity for common classes to override inline templates */
+body .nav a, body .btn-baja, body .btn-view, body .table-container table th { box-sizing: border-box; }

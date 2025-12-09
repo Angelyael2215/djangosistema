@@ -1,0 +1,50 @@
+*   [33mf8d10a9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mbajaUsuariosBack[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #7 from yael382/RegisterWorkers
+[31m|[m[32m\[m  
+[31m|[m * [33m5450bd8[m[33m ([m[1;31morigin/RegisterWorkers[m[33m, [m[1;32mRegisterWorkers[m[33m)[m Adds worker registration with document upload support
+[31m|[m[31m/[m  
+*   [33m7e91953[m Merge pull request #6 from yael382/LoginBackEnd
+[33m|[m[34m\[m  
+[33m|[m * [33mcb6c90c[m[33m ([m[1;31morigin/LoginBackEnd[m[33m, [m[1;32mLoginBackEnd[m[33m)[m Implement custom user model and authentication views; update login/logout functionality and templates
+[33m|[m[33m/[m  
+*   [33m2ab56e3[m Merge pull request #5 from yael382/UsuariosBaja
+[35m|[m[36m\[m  
+[35m|[m * [33m4bb2964[m[33m ([m[1;31morigin/UsuariosBaja[m[33m, [m[1;32mUsuariosBaja[m[33m)[m Add BajaElementos template and update navigation links
+* [36m|[m [33m2c76ca4[m Update submodule to latest main branch changes
+[36m|[m[36m/[m  
+*   [33m51f8770[m Merge pull request #4 from yael382/V1
+[1;31m|[m[1;32m\[m  
+[1;31m|[m *   [33ma5a4c66[m[33m ([m[1;31morigin/V1[m[33m)[m Merge branch 'V1' of github.com:yael382/DjangoOrticorpSistem into V1
+[1;31m|[m [1;33m|[m[1;34m\[m  
+[1;31m|[m [1;33m|[m *   [33m7c6872d[m Merge branch 'V1' of github.com:yael382/DjangoOrticorpSistem into V1
+[1;31m|[m [1;33m|[m [1;35m|[m[1;36m\[m  
+[1;31m|[m [1;33m|[m * [1;36m|[m [33mdd314bb[m Se agrega registro y inicio
+[1;31m|[m * [1;36m|[m [1;36m|[m [33md8627fe[m Update submodule to latest commit
+[1;31m|[m [1;36m|[m [1;36m|[m[1;36m/[m  
+[1;31m|[m [1;36m|[m[1;36m/[m[1;36m|[m   
+[1;31m|[m * [1;36m|[m [33me2a46b3[m Merge branch 'V1' of github.com:yael382/DjangoOrticorpSistem into V1
+[1;31m|[m [31m|[m[1;36m\[m[1;36m|[m 
+[1;31m|[m [31m|[m * [33m9673b0d[m Merge branch 'V1' of github.com:yael382/DjangoOrticorpSistem into V1
+[1;31m|[m [31m|[m[1;31m/[m[34m|[m 
+[1;31m|[m[1;31m/[m[31m|[m [34m|[m 
+[1;31m|[m [31m|[m * [33m0acbbd7[m Add WARP.md documentation file with Django project guidance
+* [31m|[m [34m|[m [33mcb3f0df[m[33m ([m[1;32mBajaUsuarios[m[33m)[m Add .gitignore to exclude Python cache files and Django specific files
+* [31m|[m [34m|[m   [33m4b1fe5c[m Merge pull request #3 from yael382/LoginUser
+[35m|[m[36m\[m [31m\[m [34m\[m  
+[35m|[m * [31m|[m [34m|[m [33m2299028[m[33m ([m[1;31morigin/LoginUser[m[33m, [m[1;32mLoginUser[m[33m)[m Implement login functionality with views, templates, and URL routing
+[35m|[m[35m/[m [31m/[m [34m/[m  
+* [31m|[m [34m|[m   [33m0fd0f31[m Merge pull request #2 from yael382/ORM
+[1;31m|[m[1;32m\[m [31m\[m [34m\[m  
+[1;31m|[m * [31m|[m [34m|[m [33mb5767f0[m[33m ([m[1;31morigin/ORM[m[33m, [m[1;32mORM[m[33m)[m Add polls app with models, admin registration, and initial migration
+[1;31m|[m[1;31m/[m [31m/[m [34m/[m  
+* [31m|[m [34m|[m   [33m44e9a69[m Merge pull request #1 from yael382/ConexioBaseDeDatos
+[34m|[m[1;34m\[m [31m\[m [34m\[m  
+[34m|[m [1;34m|[m[34m_[m[31m|[m[34m/[m  
+[34m|[m[34m/[m[1;34m|[m [31m|[m   
+[34m|[m * [31m|[m [33m4787384[m[33m ([m[1;31morigin/ConexioBaseDeDatos[m[33m, [m[1;32mConexioBaseDeDatos[m[33m)[m Update database settings to use MySQL and add initial URLs configuration
+[34m|[m * [31m|[m [33m5f175ed[m Add initial SQLite database for polls app
+[34m|[m[34m/[m [31m/[m  
+* [31m|[m [33mf55951d[m Add initial Django project structure for polls app
+* [31m|[m [33me53c6ce[m Initial commit
+ [31m/[m  
+* [33m642f0b1[m Update submodule with latest changes
+* [33m3220f45[m Descripción de tus cambios

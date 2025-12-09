@@ -1,283 +1,72 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Orticorp Seguridad</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f2f2f2;
-        }
-        .dashboard-container {
-            max-width: 1100px;
-            margin: 30px auto;
-            background: #e5e5e5;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #bdbdbd;
-            padding: 24px 32px 16px 32px;
-        }
-        .header-left h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #222;
-        }
-        .header-right .logo-img {
-            width: 70px;
-            height: auto;
-        }
-        .dashboard-nav {
-            display: flex;
-            align-items: center;
-            background: #d1d1d1;
-            padding: 12px 32px;
-            gap: 12px;
-            position: relative;
-        }
-        .nav-btn {
-            background: #fff;
-            border: 1px solid #bdbdbd;
-            border-radius: 5px;
-            padding: 7px 18px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-right: 6px;
-            transition: background 0.2s;
-        }
-        .nav-btn:hover {
-            background: #e0e0e0;
-        }
-        .filter-dropdown {
-            position: relative;
-        }
-        .filter-btn {
-            background: #fff;
-            border: 1px solid #bdbdbd;
-            border-radius: 5px;
-            padding: 7px 18px;
-            font-size: 1rem;
-            cursor: pointer;
-            min-width: 90px;
-        }
-        .filter-menu {
-            display: none;
-            position: absolute;
-            top: 38px;
-            left: 0;
-            background: #f8f8f8;
-            border: 1px solid #bdbdbd;
-            border-radius: 5px;
-            min-width: 120px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            z-index: 10;
-        }
-        .filter-menu.show {
-            display: block;
-        }
-        .filter-option {
-            padding: 10px 18px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .filter-option:hover {
-            background: #c8f7c5;
-        }
-        .dashboard-main {
-            padding: 32px;
-            background: #e5e5e5;
-        }
-        .table-container {
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            padding: 24px;
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #f8f9fa;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 16px 12px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        th {
-            background: #e3eaf7;
-            font-weight: 600;
-            color: #444;
-        }
-        tr:last-child td {
-            border-bottom: none;
-        }
-        @media (max-width: 800px) {
-            .dashboard-header, .dashboard-nav, .dashboard-main {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-            .table-container {
-                padding: 12px;
-            }
-            th, td {
-                padding: 10px 6px;
-            }
-            .header-right .logo-img {
-                width: 50px;
-            }
-        }
-        @media (max-width: 600px) {
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 16px 8px 8px 8px;
-            }
-            .dashboard-main {
-                padding: 12px;
-            }
-            .table-container {
-                padding: 4px;
-            }
-            table, th, td {
-                font-size: 0.95rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <div class="header-left">
-                <h2>Orticorp Seguridad<br>Especializada e integral</h2>
-            </div>
-            <div class="header-right">
-                <div style="text-align:right; font-size:0.95rem; color:#222;">
-                    {% if user.is_authenticated %}
-                        Usuario: <strong>{{ user.username }}</strong> | <a href="/logout/">Cerrar sesión</a>
-                    {% else %}
-                        <a href="/login/">Iniciar sesión</a>
-                    {% endif %} 
-                </div>
-                <img src="https://i.imgur.com/4M7IWwP.png" alt="Logo" class="logo-img">
-            </div>
-        </header>
-        <nav class="dashboard-nav">
-            <a class="nav-btn" href="/inicio/">Inicio</a>
-            {% if can_edit %}
-                <a class="nav-btn" href="{% url 'registrar_trabajador' %}">Registrar Trabajador</a>
-                <a class="nav-btn" href="/baja/">Baja de Elementos</a>
-            {% endif %}
-            <div class="filter-dropdown">
-                <button class="filter-btn" id="filterBtn">Filtrar ▼</button>
-                <div class="filter-menu" id="filterMenu">
-                    <div class="filter-option" data-filter="nombre">Nombre</div>
-                    <div class="filter-option" data-filter="horario">Horario</div>
-                    <div class="filter-option" data-filter="id">ID</div>
-                </div>
-            </div>
-        </nav>       
-        <main class="dashboard-main">
-            <div class="table-container">
-                <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Horario</th>
-                            <th>Departamento</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Datos falsos, se llenan por JS -->
-                    </tbody>
-                </table>
-            </div>
-        </main>
+{% extends 'polls/base.html' %}
+{% block title %}Inicio - Orticorp{% endblock %}
+
+{% block content %}
+<div class="card">
+    <form method="get" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:180px;">
+            <label for="q">Buscar</label>
+            <input id="q" name="q" type="text" value="{{ request.GET.q|default:filters.q|default:'' }}" placeholder="Nombre, apellido o CURP" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+        </div>
+
+        <div style="width:150px;">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+                <option value="">-- Todos --</option>
+                <option value="Activo" {% if request.GET.estado == 'Activo' or filters.estado == 'Activo' %}selected{% endif %}>Activo</option>
+                <option value="Inactivo" {% if request.GET.estado == 'Inactivo' or filters.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+
+        <div style="width:170px;">
+            <label for="from_date">Desde</label>
+            <input id="from_date" name="from_date" type="date" value="{{ request.GET.from_date|default:filters.from_date|default:'' }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+        </div>
+
+        <div style="width:170px;">
+            <label for="to_date">Hasta</label>
+            <input id="to_date" name="to_date" type="date" value="{{ request.GET.to_date|default:filters.to_date|default:'' }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+        </div>
+
+        <div style="display:flex;gap:8px;">
+            <button type="submit" class="btn btn-filter">Aplicar</button>
+            <a class="btn btn-reset" href="{% url 'inicio' %}">Limpiar</a>
+        </div>
+    </form>
+    <div class="table-container">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Horario</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in trabajadores %}
+                <tr>
+                    <td>{{ t.id }}</td>
+                    <td>{{ t.nombre }}</td>
+                    <td>{{ t.apellido }}{% if t.apellido_materno %} {{ t.apellido_materno }}{% endif %}</td>
+                    <td>{{ t.horario|default:'-' }}</td>
+                    <td>{{ t.fecha_ingreso|date:'d/m/Y' }}</td>
+                    <td><span class="status-badge status-{{ t.estado|lower }}">{{ t.estado|default:'-' }}</span></td>
+                    <td>
+                        <a class="link" href="{% url 'agregar_documentos' t.id %}">Documentos</a>
+                        {% if can_edit %} |
+                        <a class="link" href="{% url 'editar_trabajador' t.id %}">Editar</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7">No hay trabajadores registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <script>
-        // Datos falsos
-        const fakeData = [
-            {id: 1, nombre: "Ana López", horario: "08:00 am", departamento: "Recepción"},
-            {id: 2, nombre: "Carlos Ruiz", horario: "10:30 am", departamento: "Vigilancia"},
-            {id: 3, nombre: "Beatriz Gómez", horario: "06:00 am", departamento: "Control"},
-            {id: 4, nombre: "David Torres", horario: "11:45 pm", departamento: "Patrulla"},
-            {id: 5, nombre: "Elena Martínez", horario: "02:15 pm", departamento: "Recepción"},
-            {id: 6, nombre: "Fernando Díaz", horario: "09:00 pm", departamento: "Vigilancia"},
-            {id: 7, nombre: "Gabriela Castro", horario: "12:00 pm", departamento: "Control"},
-            {id: 8, nombre: "Hugo Sánchez", horario: "04:30 am", departamento: "Patrulla"},
-            {id: 9, nombre: "Isabel Romero", horario: "07:45 am", departamento: "Recepción"},
-            {id: 10, nombre: "Jorge Pérez", horario: "03:00 pm", departamento: "Vigilancia"}
-        ];
-
-        function renderTable(data) {
-            const tbody = document.querySelector("#dataTable tbody");
-            tbody.innerHTML = "";
-            data.forEach(row => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${row.id}</td>
-                        <td>${row.nombre}</td>
-                        <td>${row.horario}</td>
-                        <td>${row.departamento}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        // Filtrado
-        function sortData(by) {
-            let sorted = [...fakeData];
-            if (by === "nombre") {
-                sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
-            } else if (by === "horario") {
-                sorted.sort((a, b) => {
-                    // Convertir horario a minutos para comparar
-                    const toMinutes = h => {
-                        let [time, period] = h.split(" ");
-                        let [hh, mm] = time.split(":").map(Number);
-                        if (period === "pm" && hh !== 12) hh += 12;
-                        if (period === "am" && hh === 12) hh = 0;
-                        return hh * 60 + mm;
-                    };
-                    return toMinutes(a.horario) - toMinutes(b.horario);
-                });
-            } else if (by === "id") {
-                sorted.sort((a, b) => a.id - b.id);
-            }
-            renderTable(sorted);
-        }
-
-        // Inicializar tabla
-        renderTable(fakeData);
-
-        // Dropdown funcionalidad
-        const filterBtn = document.getElementById("filterBtn");
-        const filterMenu = document.getElementById("filterMenu");
-        filterBtn.onclick = () => {
-            filterMenu.classList.toggle("show");
-        };
-        document.querySelectorAll(".filter-option").forEach(opt => {
-            opt.onclick = () => {
-                sortData(opt.dataset.filter);
-                filterMenu.classList.remove("show");
-            };
-        });
-        // Cerrar menú si se hace clic fuera
-        document.addEventListener("click", function(e) {
-            if (!filterBtn.contains(e.target) && !filterMenu.contains(e.target)) {
-                filterMenu.classList.remove("show");
-            }
-        });
-    </script>
-</body>
-</html>
+</div>
+{% endblock %}

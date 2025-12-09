@@ -1,61 +1,27 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - Ortizcorp</title>
-    <style>
-        body { background: #ccc; }
-        .login-container {
-            background: #bdbdbd;
-            width: 400px;
-            margin: 60px auto;
-            padding: 30px 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 8px #333;
-            text-align: center;
-        }
-        .login-container img {
-            width: 60px;
-            margin-bottom: 10px;
-        }
-        .login-container input[type="text"],
-        .login-container input[type="password"] {
-            width: 80%;
-            padding: 8px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: 2px solid #333;
-        }
-        .login-container button {
-            padding: 8px 24px;
-            border-radius: 6px;
-            border: 1px solid #333;
-            background: #fff;
-            cursor: pointer;
-        }
-        .login-container h2 {
-            margin-bottom: 0;
-        }
-        .login-container p {
-            margin-top: 0;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Logo">
-        <h2>ORTIZCORP</h2>
-        <p>Seguridad Integral</p>
-        <form method="post">
-            {% csrf_token %}
-            {% if messages %}
-                <div style="margin-bottom:8px;color:#800">{% for message in messages %}{{ message }}<br>{% endfor %}</div>
-            {% endif %}
-            <input type="email" name="username" placeholder="Correo electrónico" required><br>
+{% extends 'polls/base.html' %}
+{% block title %}Login - Orticorp{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:480px;margin:40px auto;text-align:center;">
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Logo" style="width:64px;margin-bottom:6px">
+    <h2>ORTIZCORP</h2>
+    <p class="subtitle">Seguridad Integral</p>
+    <form method="post" style="margin-top:12px">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="email" name="username" placeholder="Correo electrónico" required>
+        </div>
+        <div class="form-group">
             <input type="password" name="password" placeholder="Contraseña" required>
-            <button type="submit">Iniciar Sesion</button>
-        </form>
-    </div>
-</body>
-</html>
+        </div>
+        <button class="btn" type="submit">Iniciar Sesión</button>
+        {% if messages %}
+            <div style="margin-top:12px">
+                {% for message in messages %}
+                    <div class="alert alert-error">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

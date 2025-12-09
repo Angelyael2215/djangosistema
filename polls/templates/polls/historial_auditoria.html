@@ -1,0 +1,90 @@
+{% extends 'polls/base.html' %}
+{% block title %}Historial de Auditoría{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:1100px;margin:18px auto;">
+  <h1>Historial de Auditoría</h1>
+
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="get" class="filters" style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-end;">
+    <div style="flex:1;">
+      <label for="trabajador">Trabajador</label>
+      <select id="trabajador" name="trabajador_id" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;background:#fff;">
+        <option value="">-- Todos --</option>
+        {% for trabajador in trabajadores %}
+          <option value="{{ trabajador.id }}" {% if request.GET.trabajador_id == trabajador.id|stringformat:"s" %}selected{% endif %}>{{ trabajador.nombre }} {{ trabajador.apellido }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="width:220px;">
+      <label for="accion">Acción</label>
+      <select id="accion" name="accion" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;background:#fff;">
+        <option value="">-- Todas --</option>
+        {% for acc in acciones %}
+          <option value="{{ acc }}" {% if request.GET.accion == acc %}selected{% endif %}>{{ acc }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="width:180px;">
+      <label for="from_date">Desde</label>
+      <input type="date" id="from_date" name="from_date" value="{{ request.GET.from_date|default:'' }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;background:#fff;">
+    </div>
+
+    <div style="width:180px;">
+      <label for="to_date">Hasta</label>
+      <input type="date" id="to_date" name="to_date" value="{{ request.GET.to_date|default:'' }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;background:#fff;">
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button type="submit" class="btn btn-filter">Filtrar</button>
+      <a href="{% url 'historial_auditoria' %}" class="btn btn-reset">Limpiar</a>
+    </div>
+  </form>
+
+  {% if auditorias and auditorias.exists %}
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Trabajador</th>
+            <th>Usuario</th>
+            <th>Acción</th>
+            <th>Estado Anterior</th>
+            <th>Estado Nuevo</th>
+            <th>Motivo</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for auditoria in auditorias %}
+            <tr>
+              <td>#{{ auditoria.id }}</td>
+              <td>{{ auditoria.trabajador.nombre }} {{ auditoria.trabajador.apellido }}</td>
+              <td>{{ auditoria.usuario.email|default:"-" }}</td>
+              <td><span class="badge badge-{{ auditoria.accion|lower }}">{{ auditoria.accion }}</span></td>
+              <td>{{ auditoria.estado_anterior|default:"-" }}</td>
+              <td>{{ auditoria.estado_nuevo|default:"-" }}</td>
+              <td>{{ auditoria.motivo|default:"-" }}</td>
+              <td class="timestamp">{{ auditoria.fecha_cambio|date:"d/m/Y H:i:s" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state"><p>No hay registros de auditoría disponibles.</p></div>
+  {% endif %}
+
+  <div style="text-align:right;margin-top:8px;"><a class="link" href="{% url 'inicio' %}">Volver al inicio</a></div>
+</div>
+{% endblock %}

@@ -78,12 +78,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'orticorpsystem',
-        'USER': 'Admin',
-        'PASSWORD': 'orticorp2209',
-        'HOST': '192.168.1.124',
+        'USER': 'root',
+        'PASSWORD': 'Montes11*',
+        'HOST': 'localhost',
         'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
-    
 }
 
 

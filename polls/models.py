@@ -99,3 +99,20 @@ class Horarios(models.Model):
 
 	def __str__(self):
 		return f"Horario de {self.trabajador}: {self.hora}, {self.dia}/{self.mes}/{self.anio}"
+
+class Auditoria(models.Model):
+	"""Registra cambios de estado en trabajadores"""
+	trabajador = models.ForeignKey(Trabajador, on_delete=models.CASCADE, related_name="auditorias")
+	usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+	accion = models.CharField(max_length=64)  # 'BAJA', 'ALTA', 'REACTIVACION', etc.
+	estado_anterior = models.CharField(max_length=64, blank=True, null=True)
+	estado_nuevo = models.CharField(max_length=64, blank=True, null=True)
+	motivo = models.TextField(blank=True, null=True)
+	fecha_cambio = models.DateTimeField(default=timezone.now)
+	
+	def __str__(self):
+		return f"Auditoría: {self.accion} - {self.trabajador} por {self.usuario} el {self.fecha_cambio}"
+	
+	class Meta:
+		ordering = ['-fecha_cambio']
+		verbose_name_plural = 'Auditorías'

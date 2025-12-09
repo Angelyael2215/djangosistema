@@ -2,12 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from ..models import Trabajador, Servicio, Documentos, Horarios
+from ..models import Trabajador, Servicio, Documentos, Horarios, Auditoria
 from ..models import CustomUser
 from ..forms import TrabajadorRegistroForm, DocumentosForm
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 import os
+from datetime import datetime
+from django.db.models import Q
 
 def is_admin(user):
     return user.role == 'ADMIN'
@@ -42,9 +44,41 @@ def login_view(request):
 @login_required
 def inicio_view(request):
     trabajadores = Trabajador.objects.all()
+
+    # Filters
+    q = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '').strip()
+    from_date = request.GET.get('from_date', '').strip()
+    to_date = request.GET.get('to_date', '').strip()
+
+    if q:
+        trabajadores = trabajadores.filter(
+            Q(nombre__icontains=q) | Q(apellido__icontains=q) | Q(apellido_materno__icontains=q) | Q(curp_text__icontains=q)
+        )
+    if estado:
+        trabajadores = trabajadores.filter(estado__iexact=estado)
+    if from_date:
+        try:
+            d1 = datetime.strptime(from_date, '%Y-%m-%d').date()
+            trabajadores = trabajadores.filter(fecha_ingreso__date__gte=d1)
+        except ValueError:
+            pass
+    if to_date:
+        try:
+            d2 = datetime.strptime(to_date, '%Y-%m-%d').date()
+            trabajadores = trabajadores.filter(fecha_ingreso__date__lte=d2)
+        except ValueError:
+            pass
+
     context = {
         'trabajadores': trabajadores,
-        'can_edit': is_hr_or_admin(request.user)
+        'can_edit': is_hr_or_admin(request.user),
+        'filters': {
+            'q': q,
+            'estado': estado,
+            'from_date': from_date,
+            'to_date': to_date,
+        }
     }
     return render(request, 'polls/inicio.html', context)
 
@@ -71,18 +105,106 @@ def register_view(request):
 
 @user_passes_test(is_hr_or_admin)
 def baja_view(request):
+    """Vista para dar de baja a trabajadores"""
     if request.method == 'POST':
         trabajador_id = request.POST.get('trabajador_id')
+        motivo = request.POST.get('motivo', '')
+        
         try:
             trabajador = Trabajador.objects.get(id=trabajador_id)
+            estado_anterior = trabajador.estado
+            
+            # Cambiar estado a Inactivo
             trabajador.estado = 'Inactivo'
             trabajador.save()
-            messages.success(request, f'El trabajador {trabajador.nombre} ha sido dado de baja.')
+            
+            # Registrar auditoría
+            Auditoria.objects.create(
+                trabajador=trabajador,
+                usuario=request.user,
+                accion='BAJA',
+                estado_anterior=estado_anterior,
+                estado_nuevo='Inactivo',
+                motivo=motivo
+            )
+            
+            messages.success(request, f'El trabajador {trabajador.nombre} {trabajador.apellido} ha sido dado de baja exitosamente.')
+            return redirect('baja')
         except Trabajador.DoesNotExist:
             messages.error(request, 'Trabajador no encontrado.')
             
+    # GET -> mostrar formulario de baja
     trabajadores = Trabajador.objects.filter(estado='Activo')
-    return render(request, 'polls/BajaElementos.html', {'trabajadores': trabajadores})
+    context = {
+        'trabajadores': trabajadores
+    }
+    return render(request, 'polls/BajaElementos.html', context)
+
+@user_passes_test(is_hr_or_admin)
+def reactivar_trabajador(request, trabajador_id):
+    """Vista para reactivar un trabajador"""
+    try:
+        trabajador = Trabajador.objects.get(id=trabajador_id)
+        estado_anterior = trabajador.estado
+        
+        trabajador.estado = 'Activo'
+        trabajador.save()
+        
+        # Registrar auditoría
+        Auditoria.objects.create(
+            trabajador=trabajador,
+            usuario=request.user,
+            accion='REACTIVACION',
+            estado_anterior=estado_anterior,
+            estado_nuevo='Activo',
+            motivo='Reactivación de trabajador'
+        )
+        
+        messages.success(request, f'El trabajador {trabajador.nombre} ha sido reactivado exitosamente.')
+    except Trabajador.DoesNotExist:
+        messages.error(request, 'Trabajador no encontrado.')
+    
+    return redirect('baja')
+
+@user_passes_test(is_admin)
+def historial_auditoria(request):
+    """Vista para ver el historial de auditoría"""
+    auditorias = Auditoria.objects.all()
+    
+    # Filtros opcionales
+    trabajador_id = request.GET.get('trabajador_id')
+    accion = request.GET.get('accion')
+    fecha_desde = request.GET.get('from_date')
+    fecha_hasta = request.GET.get('to_date')
+    
+    if trabajador_id:
+        auditorias = auditorias.filter(trabajador_id=trabajador_id)
+    if accion:
+        auditorias = auditorias.filter(accion=accion)
+    # Filtrar por fecha (si se proporcionan)
+    # Esperamos formato ISO date: YYYY-MM-DD
+    if fecha_desde:
+        try:
+            d = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+            auditorias = auditorias.filter(fecha_cambio__date__gte=d)
+        except ValueError:
+            pass
+    if fecha_hasta:
+        try:
+            d2 = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+            auditorias = auditorias.filter(fecha_cambio__date__lte=d2)
+        except ValueError:
+            pass
+    
+    trabajadores = Trabajador.objects.all()
+    acciones = Auditoria.objects.values_list('accion', flat=True).distinct()
+    
+    context = {
+        'auditorias': auditorias,
+        'trabajadores': trabajadores,
+        'acciones': acciones
+    }
+    return render(request, 'polls/historial_auditoria.html', context)
 
 @login_required
 def logout_view(request):
