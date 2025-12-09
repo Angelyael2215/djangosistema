@@ -8,12 +8,14 @@ from ..forms import TrabajadorRegistroForm, DocumentosForm
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 import os
+from datetime import datetime
+from django.db.models import Q
 
 def is_admin(user):
-    return getattr(user, 'role', None) == 'ADMIN'
+    return user.role == 'ADMIN'
 
 def is_hr_or_admin(user):
-    return getattr(user, 'role', None) in ['HR', 'ADMIN']
+    return user.role in ['HR', 'ADMIN']
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -42,9 +44,41 @@ def login_view(request):
 @login_required
 def inicio_view(request):
     trabajadores = Trabajador.objects.all()
+
+    # Filters
+    q = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', '').strip()
+    from_date = request.GET.get('from_date', '').strip()
+    to_date = request.GET.get('to_date', '').strip()
+
+    if q:
+        trabajadores = trabajadores.filter(
+            Q(nombre__icontains=q) | Q(apellido__icontains=q) | Q(apellido_materno__icontains=q) | Q(curp_text__icontains=q)
+        )
+    if estado:
+        trabajadores = trabajadores.filter(estado__iexact=estado)
+    if from_date:
+        try:
+            d1 = datetime.strptime(from_date, '%Y-%m-%d').date()
+            trabajadores = trabajadores.filter(fecha_ingreso__date__gte=d1)
+        except ValueError:
+            pass
+    if to_date:
+        try:
+            d2 = datetime.strptime(to_date, '%Y-%m-%d').date()
+            trabajadores = trabajadores.filter(fecha_ingreso__date__lte=d2)
+        except ValueError:
+            pass
+
     context = {
         'trabajadores': trabajadores,
-        'can_edit': is_hr_or_admin(request.user)
+        'can_edit': is_hr_or_admin(request.user),
+        'filters': {
+            'q': q,
+            'estado': estado,
+            'from_date': from_date,
+            'to_date': to_date,
+        }
     }
     return render(request, 'polls/inicio.html', context)
 
@@ -140,11 +174,27 @@ def historial_auditoria(request):
     # Filtros opcionales
     trabajador_id = request.GET.get('trabajador_id')
     accion = request.GET.get('accion')
+    fecha_desde = request.GET.get('from_date')
+    fecha_hasta = request.GET.get('to_date')
     
     if trabajador_id:
         auditorias = auditorias.filter(trabajador_id=trabajador_id)
     if accion:
         auditorias = auditorias.filter(accion=accion)
+    # Filtrar por fecha (si se proporcionan)
+    # Esperamos formato ISO date: YYYY-MM-DD
+    if fecha_desde:
+        try:
+            d = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+            auditorias = auditorias.filter(fecha_cambio__date__gte=d)
+        except ValueError:
+            pass
+    if fecha_hasta:
+        try:
+            d2 = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+            auditorias = auditorias.filter(fecha_cambio__date__lte=d2)
+        except ValueError:
+            pass
     
     trabajadores = Trabajador.objects.all()
     acciones = Auditoria.objects.values_list('accion', flat=True).distinct()

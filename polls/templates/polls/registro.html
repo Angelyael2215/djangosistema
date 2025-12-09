@@ -1,306 +1,68 @@
-<!DOCTYPE html>
-<html lang="es">
-{% load static %}
-<head>
-    <meta charset="UTF-8">
-    <title>Registro De Trabajadores</title>
-    <link rel="stylesheet" href="{% static 'polls/css/theme.css' %}">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f2f2f2;
-        }
-        .dashboard-container {
-            max-width: 1100px;
-            margin: 30px auto;
-            background: #e5e5e5;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #bdbdbd;
-            padding: 24px 32px 16px 32px;
-        }
-        .header-left h2 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #222;
-        }
-        .header-right .logo-img {
-            width: 70px;
-            height: auto;
-        }
-        .dashboard-nav {
-            display: flex;
-            align-items: center;
-            background: #d1d1d1;
-            padding: 12px 32px;
-            gap: 12px;
-            position: relative;
-        }
-        .nav-btn {
-            background: #fff;
-            border: 1px solid #bdbdbd;
-            border-radius: 5px;
-            padding: 7px 18px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-right: 6px;
-            transition: background 0.2s;
-            text-decoration: none;
-            color: #222;
-            display: inline-block;
-        }
-        .nav-btn:hover {
-            background: #e0e0e0;
-        }
-        .form-section {
-            background: #fff;
-            border-radius: 8px;
-            margin: 32px;
-            padding: 24px 24px 16px 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #bdbdbd;
-        }
-        .form-section-title {
-            font-weight: 700;
-            color: #1a3e8a;
-            font-size: 1.1rem;
-            margin-bottom: 18px;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px 24px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            font-size: 0.98rem;
-            margin-bottom: 4px;
-            color: #222;
-        }
-        .form-group input {
-            padding: 7px 10px;
-            border: 1px solid #bdbdbd;
-            border-radius: 5px;
-            font-size: 1rem;
-            background: #fafafa;
-        }
-        .form-group input:focus {
-            outline: 1.5px solid #1a3e8a;
-        }
-        .form-section-bottom {
-            display: flex;
-            gap: 0;
-            margin-top: 32px;
-        }
-        .form-bottom-left, .form-bottom-right {
-            flex: 1;
-            background: #fff;
-            border-radius: 8px;
-            padding: 24px 18px 18px 18px;
-            border: 1px solid #bdbdbd;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .form-bottom-left {
-            margin-right: 0;
-        }
-        .form-bottom-right {
-            margin-left: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-        }
-        .form-bottom-title {
-            font-weight: 700;
-            color: #1a3e8a;
-            font-size: 1.1rem;
-            margin-bottom: 18px;
-        }
-        .form-bottom-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px 24px;
-        }
-        .form-bottom-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 12px;
-        }
-        .form-bottom-group label {
-            font-size: 0.98rem;
-            margin-bottom: 4px;
-            color: #222;
-        }
-        .form-bottom-group input,
-        .form-bottom-group select {
-            padding: 7px 10px;
-            border: 1px solid #bdbdbd;
-            border-radius: 5px;
-            font-size: 1rem;
-            background: #fafafa;
-        }
-        .form-bottom-group input:focus,
-        .form-bottom-group select:focus {
-            outline: 1.5px solid #1a3e8a;
-        }
-        .divider {
-            width: 2px;
-            background: repeating-linear-gradient(
-                to bottom,
-                #bdbdbd,
-                #bdbdbd 8px,
-                transparent 8px,
-                transparent 16px
-            );
-            margin: 0 18px;
-        }
-        .upload-area {
-            border: 2px dashed #bdbdbd;
-            border-radius: 8px;
-            background: #fafafa;
-            width: 90%;
-            min-height: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 18px;
-            margin-top: 8px;
-            padding: 18px;
-        }
-        .upload-area img {
-            width: 48px;
-            opacity: 0.7;
-            margin-bottom: 8px;
-        }
-        .upload-area-text {
-            color: #444;
-            font-size: 0.98rem;
-            text-align: center;
-        }
-        .upload-btn {
-            background: #222;
-            color: #fff;
-            border: none;
-            border-radius: 18px;
-            padding: 8px 32px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin-top: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: background 0.2s;
-        }
-        .upload-btn:hover {
-            background: #1a3e8a;
-        }
-        @media (max-width: 900px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .form-section {
-                margin: 18px;
-                padding: 18px;
-            }
-            .form-section-bottom {
-                flex-direction: column;
-            }
-            .divider {
-                display: none;
-            }
-            .form-bottom-left, .form-bottom-right {
-                margin: 0 0 18px 0;
-            }
-        }
-        @media (max-width: 600px) {
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 16px 8px 8px 8px;
-            }
-            .dashboard-nav {
-                padding-left: 8px;
-                padding-right: 8px;
-            }
-            .form-section {
-                margin: 8px;
-                padding: 8px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .form-bottom-left, .form-bottom-right {
-                padding: 8px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <div class="header-left">
-                <h2>Registro De<br>Trabajadores</h2>
-            </div>
-            <div class="header-right">
-                <img src="https://i.imgur.com/4M7IWwP.png" alt="Logo" class="logo-img">
-            </div>
-        </header>
-        <nav class="dashboard-nav">
-            <a href="/inicio/" class="nav-btn">Inicio</a>
-            <a href="/registro/" class="nav-btn">Registro</a>
-            <a href="/baja/" class="nav-btn">Baja de Elementos</a>
-        </nav>
-        <section class="form-section">
+{% extends 'polls/base.html' %}
+{% block title %}Registro de Trabajadores - Orticorp{% endblock %}
+
+{% block content %}
+<div class="card">
+    <form method="post" action="{% url 'registro' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-section">
             <div class="form-section-title">Datos Personales</div>
-            <form method="post" action="{% url 'registro' %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>ID No:</label>
-                        <input type="text" name="id_no" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>R.F.C:</label>
-                        <input type="text" name="rfc" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>No.exterior:</label>
-                        <input type="text" name="no_exterior" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>Nombre(S):</label>
-                        <input type="text" name="nombre" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>C.U.R.P:</label>
-                        <input type="text" name="curp_text" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>Código Postal:</label>
-                        <input type="text" name="codigo_postal" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>Apellido Paterno:</label>
-                        <input type="text" name="apellido_paterno" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>C.U.I.P:</label>
-                        <input type="text" name="cuip_text" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>Apellido Materno:</label>
-                        <input type="text" name="apellido_materno" placeholder="Value">
-                    </div>
+            <div class="form-grid">
+                <div class="form-group"><label>ID No:</label><input type="text" name="id_no" placeholder=""></div>
+                <div class="form-group"><label>R.F.C:</label><input type="text" name="rfc" placeholder=""></div>
+                <div class="form-group"><label>No.exterior:</label><input type="text" name="no_exterior" placeholder=""></div>
+                <div class="form-group"><label>Nombre(S):</label><input type="text" name="nombre" placeholder=""></div>
+                <div class="form-group"><label>C.U.R.P:</label><input type="text" name="curp_text" placeholder=""></div>
+                <div class="form-group"><label>Código Postal:</label><input type="text" name="codigo_postal" placeholder=""></div>
+                <div class="form-group"><label>Apellido Paterno:</label><input type="text" name="apellido_paterno" placeholder=""></div>
+                <div class="form-group"><label>C.U.I.P:</label><input type="text" name="cuip_text" placeholder=""></div>
+                <div class="form-group"><label>Apellido Materno:</label><input type="text" name="apellido_materno" placeholder=""></div>
+                <div class="form-group"><label>Entidad Federativa:</label><input type="text" name="entidad_federativa" placeholder=""></div>
+                <div class="form-group"><label>Numero De Seguro Social (NSS):</label><input type="text" name="nss_text" placeholder=""></div>
+                <div class="form-group"><label>Calle:</label><input type="text" name="calle" placeholder=""></div>
+            </div>
+        </div>
+
+        <div class="form-section" style="margin-top:18px;">
+            <div class="form-section-title">Datos del Trabajador</div>
+            <div class="form-bottom-grid">
+                <div class="form-bottom-group"><label>Horario:</label>
+                    <select name="horario">
+                        <option value="06:00-14:00">06:00 am - 02:00 pm</option>
+                        <option value="14:00-22:00">02:00 pm - 10:00 pm</option>
+                        <option value="22:00-06:00">10:00 pm - 06:00 am</option>
+                    </select>
+                </div>
+                <div class="form-bottom-group"><label>Calle Del Servicio:</label><input type="text" name="calle_servicio"></div>
+                <div class="form-bottom-group"><label>No.Exterior:</label><input type="text" name="no_exterior_servicio"></div>
+                <div class="form-bottom-group"><label>Entidad:</label><input type="text" name="entidad_servicio"></div>
+                <div class="form-bottom-group"><label>Estado:</label><input type="text" name="estado_servicio"></div>
+            </div>
+        </div>
+
+        <div class="form-section" style="margin-top:18px;">
+            <div class="form-section-title">Adjuntar Archivos</div>
+            <div class="upload-area">
+                <img src="https://cdn-icons-png.flaticon.com/512/60/60761.png" alt="Adjuntar">
+                <div class="upload-area-text">Adjunta los archivos aquí (RFC, CURP, etc.)</div>
+                <div style="width:100%; margin-top:12px; text-align:left;">
+                    <label>CUIP (archivo)</label><input type="file" name="cuip">
+                    <label>Antecedentes (archivo)</label><input type="file" name="antecedentes">
+                    <label>Situación Fiscal (archivo)</label><input type="file" name="situacion_fiscal">
+                    <label>CURP (archivo)</label><input type="file" name="curp">
+                    <label>NSS (archivo)</label><input type="file" name="nss">
+                    <label>Cursos (archivo)</label><input type="file" name="cursos">
+                    <label>Certificado de Estudios (archivo)</label><input type="file" name="certificado_estudios">
+                </div>
+            </div>
+            <div style="text-align:right;margin-top:10px;">
+                <button class="btn" type="submit">Registrar y Subir</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
                     <div class="form-group">
                         <label>Entidad Federativa:</label>
                         <input type="text" name="entidad_federativa" placeholder="Value">

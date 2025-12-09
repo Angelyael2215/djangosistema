@@ -1,274 +1,79 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Baja de Trabajadores - Ortizcorp</title>
-    <link rel="stylesheet" href="{% static 'polls/css/theme.css' %}">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #f2f2f2;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            color: #222;
-        }
-        .container {
-            max-width: 1150px;
-            margin: 24px auto;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            overflow: hidden;
-        }
-        /* Header: light gray like the screenshot */
-        .header {
-            background: #d0d0d0;
-            color: #111;
-            padding: 28px 32px;
-            text-align: left;
-        }
-        .header h1 {
-            font-size: 1.9rem;
-            margin-bottom: 6px;
-        }
-        .header p {
-            font-size: 1rem;
-            opacity: 0.85;
-        }
+{% extends 'polls/base.html' %}
+{% block title %}Baja de Trabajadores{% endblock %}
 
-        /* Nav buttons: white with purple border and purple text */
-        .nav {
-            background: #efefef;
-            padding: 14px 32px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .nav a {
-            padding: 10px 16px;
-            background: #ffffff;
-            border: 2px solid #7b1fa2; /* purple */
-            border-radius: 8px;
-            text-decoration: none;
-            color: #7b1fa2;
-            font-weight: 600;
-            transition: all 0.18s ease-in-out;
-        }
-        .nav a:hover {
-            background: #7b1fa2;
-            color: white;
-            transform: translateY(-1px);
-        }
+{% block content %}
+<div class="card" style="max-width:1100px;margin:18px auto;">
+  <h1>Baja de Trabajadores</h1>
 
-        .content {
-            padding: 30px 36px;
-        }
-        .messages {
-            margin-bottom: 18px;
-        }
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            border-left: 4px solid;
-        }
-        .alert-success {
-            background: #e9f7ef;
-            color: #145a32;
-            border-left-color: #27ae60;
-        }
-        .alert-error {
-            background: #fdecea;
-            color: #7a1a1a;
-            border-left-color: #e74c3c;
-        }
+  {% if messages %}{% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+  {% endfor %}{% endif %}
 
-        .table-container {
-            background: #ffffff;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #e6edf7;
-            margin-bottom: 24px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        /* Table header: soft blue */
-        th {
-            background: #eaf3ff;
-            color: #12324a;
-            padding: 16px;
-            text-align: left;
-            font-weight: 700;
-            border-bottom: 1px solid #e6edf7;
-        }
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #2b3a42;
-        }
-        tr:hover {
-            background: #fbfdff;
-        }
+  <table class="table">
+    <thead>
+      <tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>CURP</th><th>Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for trabajador in trabajadores %}
+      <tr>
+        <td>{{ trabajador.id }}</td>
+        <td>{{ trabajador.nombre }}</td>
+        <td>{{ trabajador.apellido }}</td>
+        <td>{{ trabajador.curp }}</td>
+        <td><span class="status-badge status-{{ trabajador.estado|lower }}">{{ trabajador.estado }}</span></td>
+        <td>
+          {% if trabajador.estado != 'Inactivo' %}
+            <button class="btn btn-baja" type="button" onclick="abrirModal({{ trabajador.id }}, '{{ trabajador.nombre }} {{ trabajador.apellido }}')">Dar de Baja</button>
+          {% else %}
+            <form method="post" action="{% url 'reactivar_trabajador' trabajador.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button class="btn btn-secondary" type="submit">Reactivar</button>
+            </form>
+          {% endif %}
+          <a class="link" href="{% url 'agregar_documentos' trabajador.id %}">Documentos</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No hay trabajadores registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        .btn {
-            padding: 8px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.92rem;
-            transition: all 0.16s ease;
-            text-decoration: none;
-            display: inline-block;
-            border: 2px solid transparent;
-            background: transparent;
-        }
-        /* Baja button: white with purple border/text */
-        .btn-baja {
-            background: #ffffff;
-            border: 2px solid #7b1fa2;
-            color: #7b1fa2;
-            font-weight: 700;
-        }
-        .btn-baja:hover {
-            background: #7b1fa2;
-            color: #fff;
-        }
-        /* View documents: similar style */
-        .btn-view {
-            background: #ffffff;
-            border: 2px solid #2b6ea3; /* muted blue */
-            color: #2b6ea3;
-            font-weight: 700;
-        }
-        .btn-view:hover {
-            background: #2b6ea3;
-            color: #fff;
-        }
+  <div style="text-align:right;margin-top:8px;"><a class="link" href="{% url 'inicio' %}">Volver al inicio</a></div>
+</div>
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.36);
-        }
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background: #ffffff;
-            padding: 22px 22px;
-            border-radius: 10px;
-            box-shadow: 0 8px 30px rgba(11,22,38,0.15);
-            max-width: 520px;
-            width: 92%;
-        }
-        .modal-header {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #7b1fa2;
-        }
-        .modal-body {
-            margin-bottom: 14px;
-        }
-        .modal-body p {
-            margin-bottom: 12px;
-            color: #444;
-        }
-        .form-group {
-            margin-bottom: 12px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #333;
-        }
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e1e7ee;
-            border-radius: 6px;
-            font-size: 0.98rem;
-            font-family: Arial, sans-serif;
-            resize: vertical;
-            min-height: 80px;
-        }
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-        .btn-cancel {
-            background: #f0f0f0;
-            color: #333;
-            padding: 10px 18px;
-            border: 1px solid #d0d0d0;
-            border-radius: 8px;
-        }
-        .btn-cancel:hover {
-            background: #e6e6e6;
-        }
-        .btn-confirm {
-            background: #7b1fa2;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: 2px solid #7b1fa2;
-        }
-        .btn-confirm:hover {
-            background: #5e157f;
-            border-color: #5e157f;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 36px;
-            color: #7a7a7a;
-        }
-        .empty-state p {
-            font-size: 1.05rem;
-            margin-bottom: 10px;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-        .status-activo {
-            background: #eaf3ff;
-            color: #1b4f7a;
-        }
-        .status-inactivo {
-            background: #fbecec;
-            color: #832029;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Baja de Trabajadores</h1>
-            <p>Gestiona la baja de trabajadores en el sistema</p>
-        </div>
+<!-- Modal para confirmar baja -->
+<div id="modalBaja" class="modal" style="display:none; position:fixed; left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;">
+  <div class="modal-content" style="background:#fff;padding:20px;border-radius:8px;max-width:520px;margin:auto;">
+    <h3 id="modalTitle">Confirmar Baja</h3>
+    <p id="modalBody">¿Estás seguro de dar de baja a este trabajador?</p>
+    <form id="formBaja" method="post" action="{% url 'baja' %}">
+      {% csrf_token %}
+      <input type="hidden" name="trabajador_id" id="modal_trabajador_id">
+      <div class="form-group">
+        <label for="motivo">Motivo (opcional)</label>
+        <textarea name="motivo" id="modal_motivo" placeholder="Motivo de la baja..."></textarea>
+      </div>
+      <div style="text-align:right;margin-top:8px;">
+        <button type="button" class="btn btn-cancel" onclick="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-confirm">Confirmar Baja</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-        <div class="nav">
+<script>
+function abrirModal(id, nombre){
+  document.getElementById('modal_trabajador_id').value = id;
+  document.getElementById('modalBody').textContent = '¿Estás seguro de dar de baja a ' + nombre + '?';
+  document.getElementById('modalBaja').style.display = 'flex';
+}
+function cerrarModal(){
+  document.getElementById('modalBaja').style.display = 'none';
+}
+</script>
+
+{% endblock %}
             <a href="/inicio/">Inicio</a>
             <a href="/registro/">Registrar Trabajador</a>
             <a href="/baja/">Baja de Elementos</a>
