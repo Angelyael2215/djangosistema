@@ -1,0 +1,26 @@
+{% extends 'polls/base.html' %}
+{% block title %}Facturas{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Facturas</h1>
+  <div style="margin-bottom:12px;"><a class="btn" href="{% url 'facturacion:factura_create' %}">Crear Factura</a></div>
+  <div style="margin-bottom:12px;"><a class="btn" href="{% url 'facturacion:cliente_list' %}">Clientes</a></div>
+  <table class="table">
+    <thead><tr><th>Folio</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      {% for f in facturas %}
+      <tr>
+        <td>{{ f.folio }}</td>
+        <td>{{ f.cliente.nombre }}</td>
+        <td>{{ f.fecha }}</td>
+        <td>{{ f.total }}</td>
+        <td>{{ f.estado }}</td>
+        <td><a class="link" href="{% url 'facturacion:factura_detail' f.id %}">Ver</a> | <a class="link" href="{% url 'facturacion:factura_pdf' f.id %}">PDF</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No hay facturas</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

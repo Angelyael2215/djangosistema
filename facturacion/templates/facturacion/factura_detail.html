@@ -1,0 +1,26 @@
+{% extends 'polls/base.html' %}
+{% block title %}Factura {{ factura.folio }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Factura {{ factura.folio }}</h1>
+  <p><strong>Cliente:</strong> {{ factura.cliente.nombre }} ({{ factura.cliente.rfc }})</p>
+  <p><strong>Fecha:</strong> {{ factura.fecha }}</p>
+  <table class="table">
+    <thead><tr><th>Descripcion</th><th>Cantidad</th><th>P.Unit</th><th>Importe</th></tr></thead>
+    <tbody>
+      {% for it in factura.items.all %}
+        <tr>
+          <td>{{ it.descripcion }}</td>
+          <td>{{ it.cantidad }}</td>
+          <td>{{ it.precio_unitario }}</td>
+          <td>{{ it.importe }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p><strong>Subtotal:</strong> {{ factura.subtotal }}</p>
+  <p><strong>Impuestos:</strong> {{ factura.impuestos }}</p>
+  <p><strong>Total:</strong> {{ factura.total }}</p>
+  <p><a class="link" href="{% url 'facturacion:factura_pdf' factura.id %}">Descargar PDF</a></p>
+</div>
+{% endblock %}
