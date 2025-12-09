@@ -1,0 +1,12 @@
+{% extends 'polls/base.html' %}
+{% block title %}Cliente{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{% if cliente %}Editar Cliente{% else %}Nuevo Cliente{% endif %}</h1>
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit">Guardar</button>
+    <a class="btn" href="{% url 'facturacion:cliente_list' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

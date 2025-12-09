@@ -1,0 +1,179 @@
+{% extends 'polls/base.html' %}
+{% block title %}Nueva Factura{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Crear Factura</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+    {% if formset.non_form_errors %}
+      <div class="alert alert-error">
+        {{ formset.non_form_errors }}
+      </div>
+    {% endif %}
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:260px;">{{ form.as_p }}</div>
+      <div style="flex:1;min-width:260px;">
+        <h3>Items</h3>
+        <p style="font-size:0.9rem;color:#444;margin-top:0;margin-bottom:8px;">Un "item" es una línea de la factura (producto o servicio). Rellena descripción, cantidad y precio unitario.</p>
+        {{ formset.management_form }}
+        <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+          <button type="button" id="add-item" class="btn">Agregar item</button>
+          <small style="color:#666;">Agrega una nueva línea para producto o servicio.</small>
+        </div>
+
+        <div id="items-container">
+          {% for f in formset.forms %}
+          <div class="factura-item" style="border:1px solid #eee;padding:8px;margin-bottom:6px;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;" data-form-index="{{ forloop.counter0 }}">
+            <div style="flex:1;min-width:160px;">
+              <label>Descripción</label>
+              {{ f.descripcion }}
+            </div>
+            <div style="width:120px;">
+              <label>Cantidad</label>
+              {{ f.cantidad }}
+            </div>
+            <div style="width:140px;">
+              <label>Precio Unitario</label>
+              {{ f.precio_unitario }}
+            </div>
+            <div style="width:100px;text-align:right;">
+              <label>Importe</label>
+              <div class="item-importe">0.00</div>
+            </div>
+            <div style="width:80px;text-align:center;">
+              <label>Eliminar</label>
+              {{ f.DELETE }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- empty form template for cloning -->
+        <div id="empty-form-template" style="display:none;">
+          {{ formset.empty_form }}
+        </div>
+
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+          <button id="factura-save" class="btn" type="submit" disabled>Guardar</button>
+          <a class="btn" href="{% url 'facturacion:factura_list' %}">Cancelar</a>
+        </div>
+        <div style="margin-top:12px;padding-top:8px;border-top:1px solid #f0f0f0;">
+          <div style="display:flex;justify-content:flex-end;gap:18px;align-items:center;">
+            <div>Subtotal: <strong id="subtotal">0.00</strong></div>
+            <div>Impuestos (16%): <strong id="impuestos">0.00</strong></div>
+            <div>Total: <strong id="total">0.00</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <script>
+    (function(){
+      // Utility: get form prefix (e.g. 'form-0') from a field name ending with suffix like '-descripcion'
+      function getPrefixFromName(name, suffix){
+        return name.replace(new RegExp(suffix + '$'), '');
+      }
+
+      function parseNumber(v){
+        if(!v) return NaN;
+        return parseFloat((v+'').replace(',','.'));
+      }
+
+      function recalcRow(row){
+        var desc = row.querySelector('[name$="-descripcion"]');
+        var cant = row.querySelector('[name$="-cantidad"]');
+        var price = row.querySelector('[name$="-precio_unitario"]');
+        var del = row.querySelector('[name$="-DELETE"]');
+        if(del && del.type === 'checkbox' && del.checked){
+          row.querySelector('.item-importe').textContent = '0.00';
+          return 0;
+        }
+        var cantVal = parseNumber(cant ? cant.value : 0);
+        var priceVal = parseNumber(price ? price.value : 0);
+        var importe = 0;
+        if(!isNaN(cantVal) && !isNaN(priceVal)) importe = cantVal * priceVal;
+        var fmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+        row.querySelector('.item-importe').textContent = fmt.format(importe);
+        return importe;
+      }
+
+      function recalcTotals(){
+        var rows = document.querySelectorAll('#items-container .factura-item');
+        var subtotal = 0;
+        rows.forEach(function(r){ subtotal += recalcRow(r); });
+        var impuestos = subtotal * 0.16;
+        var total = subtotal + impuestos;
+        var fmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+        document.getElementById('subtotal').textContent = fmt.format(subtotal);
+        document.getElementById('impuestos').textContent = fmt.format(impuestos);
+        document.getElementById('total').textContent = fmt.format(total);
+        // enable save if at least one valid row
+        var btn = document.getElementById('factura-save');
+        if(btn) btn.disabled = !(subtotal > 0);
+      }
+
+      function addRowFromTemplate(){
+        var container = document.getElementById('items-container');
+        var templateHtml = document.getElementById('empty-form-template').innerHTML;
+        var totalEl = document.querySelector('input[name$="-TOTAL_FORMS"]');
+        var idx = totalEl ? parseInt(totalEl.value,10) : 0;
+        // replace __prefix__ with idx
+        var html = templateHtml.replace(/__prefix__/g, idx);
+        // create wrapper
+        var wrapper = document.createElement('div');
+        wrapper.className = 'factura-item';
+        wrapper.setAttribute('data-form-index', idx);
+        wrapper.style.cssText = 'border:1px solid #eee;padding:8px;margin-bottom:6px;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;';
+        // build inner structure: we will extract the inputs from html
+        wrapper.innerHTML = html;
+        // Append importe display and delete label if needed
+        var importeDiv = document.createElement('div'); importeDiv.style.width='100px'; importeDiv.style.textAlign='right';
+        importeDiv.innerHTML = '<label>Importe</label><div class="item-importe">0.00</div>';
+        wrapper.appendChild(importeDiv);
+        // Ensure DELETE exists: if not, create a hidden input to keep form count consistent
+        var del = wrapper.querySelector('input[name$="-DELETE"]');
+        if(!del){
+          var delWrap = document.createElement('div'); delWrap.style.width='80px'; delWrap.style.textAlign='center';
+          delWrap.innerHTML = '<label>Eliminar</label><input type="checkbox" name="' + ('form-' + idx + '-DELETE') + '" />';
+          wrapper.appendChild(delWrap);
+        } else {
+          // move existing delete input into a visible labeled div
+          var parent = del.parentElement;
+          var labelDiv = document.createElement('div'); labelDiv.style.width='80px'; labelDiv.style.textAlign='center';
+          labelDiv.innerHTML = '<label>Eliminar</label>';
+          labelDiv.appendChild(del);
+          wrapper.appendChild(labelDiv);
+          if(parent) parent.remove();
+        }
+        container.appendChild(wrapper);
+        // increment TOTAL_FORMS
+        if(totalEl) totalEl.value = idx + 1;
+        attachListeners(wrapper);
+        recalcTotals();
+      }
+
+      function attachListeners(wrapper){
+        var cant = wrapper.querySelector('[name$="-cantidad"]');
+        var price = wrapper.querySelector('[name$="-precio_unitario"]');
+        var del = wrapper.querySelector('[name$="-DELETE"]');
+        [cant, price].forEach(function(el){ if(el) el.addEventListener('input', recalcTotals); });
+        if(del) del.addEventListener('change', function(){ wrapper.style.display = del.checked ? 'none' : ''; recalcTotals(); });
+      }
+
+      // Attach initial listeners
+      document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('#items-container .factura-item').forEach(function(r){ attachListeners(r); });
+        document.getElementById('add-item').addEventListener('click', addRowFromTemplate);
+        // Recalc once
+        recalcTotals();
+      });
+
+    })();
+  </script>
+</div>
+{% endblock %}
