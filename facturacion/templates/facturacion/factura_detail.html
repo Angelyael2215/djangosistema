@@ -1,10 +1,18 @@
 {% extends 'polls/base.html' %}
+{% load static %}
 {% block title %}Factura {{ factura.folio }}{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>Factura {{ factura.folio }}</h1>
-  <p><strong>Cliente:</strong> {{ factura.cliente.nombre }} ({{ factura.cliente.rfc }})</p>
-  <p><strong>Fecha:</strong> {{ factura.fecha }}</p>
+<div class="card" style="max-width:900px;margin:18px auto;padding:18px;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+    <img src="{% static 'facturacion/logo.png' %}" alt="Logo" style="height:64px;width:auto;object-fit:contain;">
+    <div>
+      <h2 style="margin:0;">Factura {{ factura.folio }}</h2>
+      <div style="color:#555;font-size:0.95rem;">Fecha: {{ factura.fecha|date:'Y-m-d' }}</div>
+    </div>
+  </div>
+  <div style="margin-bottom:12px;">
+    <strong>Cliente:</strong> {{ factura.cliente.nombre }} ({{ factura.cliente.rfc }})
+  </div>
   <table class="table">
     <thead><tr><th>Descripcion</th><th>Cantidad</th><th>P.Unit</th><th>Importe</th></tr></thead>
     <tbody>
@@ -20,7 +28,11 @@
   </table>
   <p><strong>Subtotal:</strong> {{ factura.subtotal }}</p>
   <p><strong>Impuestos:</strong> {{ factura.impuestos }}</p>
-  <p><strong>Total:</strong> {{ factura.total }}</p>
-  <p><a class="link" href="{% url 'facturacion:factura_pdf' factura.id %}">Descargar PDF</a></p>
+  <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:12px;font-weight:bold;">
+    <div>Total: {{ factura.total }}</div>
+  </div>
+  <div style="margin-top:12px;">
+    <a class="link" href="{% url 'facturacion:factura_pdf' factura.id %}">Descargar PDF</a>
+  </div>
 </div>
 {% endblock %}

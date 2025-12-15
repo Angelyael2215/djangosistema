@@ -11,4 +11,7 @@ urlpatterns = [
     path('crear/', views.factura_create, name='factura_create'),
     path('<int:factura_id>/', views.factura_detail, name='factura_detail'),
     path('<int:factura_id>/pdf/', views.factura_pdf, name='factura_pdf'),
+    path('reportes/mes/', views.reportes_mes, name='reportes_mes'),
+    path('reportes/export_csv/', views.export_facturas_csv, name='export_facturas_csv'),
+    path('reportes/export_xls/', views.export_facturas_xls, name='export_facturas_xls'),
 ]
