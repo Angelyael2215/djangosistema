@@ -1,8 +1,12 @@
 {% extends 'polls/base.html' %}
+{% load static %}
 {% block title %}Nueva Factura{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>Crear Factura</h1>
+<div class="card" style="max-width:1100px;margin:18px auto;padding:16px;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+    <img src="{% static 'facturacion/logo.png' %}" alt="Logo" style="height:56px;width:auto;object-fit:contain;">
+    <h1 style="margin:0;">Crear Factura</h1>
+  </div>
   <form method="post">
     {% csrf_token %}
     {% if form.non_field_errors %}

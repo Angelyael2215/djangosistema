@@ -100,7 +100,7 @@ class Horarios(models.Model):
 	def __str__(self):
 		return f"Horario de {self.trabajador}: {self.hora}, {self.dia}/{self.mes}/{self.anio}"
 
-class Auditoria(models.Model):
+class 	Auditoria(models.Model):
 	"""Registra cambios de estado en trabajadores"""
 	trabajador = models.ForeignKey(Trabajador, on_delete=models.CASCADE, related_name="auditorias")
 	usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)

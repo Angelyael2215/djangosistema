@@ -34,17 +34,7 @@
         </div>
     </form>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div>
-            <a class="btn" href="{% url 'registrar_trabajador' %}">Registrar Trabajador</a>
-            {% if user.is_authenticated and user.role in 'HRADMIN' %}
-            <!-- placeholder for role check if needed -->
-            {% endif %}
-        </div>
-        <div>
-            <a class="btn" href="{% url 'facturacion:cliente_list' %}">Clientes</a>
-        </div>
-    </div>
+    
 
     <div class="table-container">
         <table id="dataTable">

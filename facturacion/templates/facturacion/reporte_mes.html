@@ -1,0 +1,108 @@
+{% extends 'polls/base.html' %}
+{% block title %}Reporte Mensual - Facturación{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:1100px;margin:18px auto;">
+  <h1>Reporte Mensual de Facturas</h1>
+
+  <form method="get" style="display:flex;gap:12px;align-items:flex-end;margin-bottom:12px;">
+    <div>
+      <label for="year">Año</label>
+      <input type="number" id="year" name="year" value="{{ year }}" style="width:100px;padding:6px;border:1px solid #ddd;border-radius:4px;">
+    </div>
+    <div>
+      <label for="month">Mes</label>
+      <input type="number" id="month" name="month" value="{{ month }}" min="1" max="12" style="width:80px;padding:6px;border:1px solid #ddd;border-radius:4px;">
+    </div>
+    <div style="min-width:240px;">
+      <label for="cliente">Cliente</label>
+      <select id="cliente" name="cliente_id" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;background:#fff;">
+        <option value="">-- Todos --</option>
+        {% for c in clientes %}
+          <option value="{{ c.id }}" {% if selected_cliente and selected_cliente|stringformat:'s' == c.id|stringformat:'s' %}selected{% endif %}>{{ c.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="min-width:180px;">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;background:#fff;">
+        <option value="">-- Todos --</option>
+        <option value="BORRADOR" {% if selected_estado == 'BORRADOR' %}selected{% endif %}>Borrador</option>
+        <option value="EMITIDA" {% if selected_estado == 'EMITIDA' %}selected{% endif %}>Emitida</option>
+        <option value="PAGADA" {% if selected_estado == 'PAGADA' %}selected{% endif %}>Pagada</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button type="submit" class="btn btn-filter">Aplicar</button>
+      <a href="{% url 'facturacion:reportes_mes' %}" class="btn btn-reset">Limpiar</a>
+      <a href="{% url 'facturacion:export_facturas_csv' %}?{% if base_qs %}{{ base_qs }}&{% endif %}format=csv" class="btn btn-primary">Exportar CSV</a>
+      <a href="{% url 'facturacion:export_facturas_xls' %}?{% if base_qs %}{{ base_qs }}&{% endif %}format=xlsx" class="btn btn-primary">Exportar XLSX</a>
+    </div>
+  </form>
+
+  {% if facturas %}
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Folio</th>
+            <th>Cliente</th>
+            <th>Subtotal</th>
+            <th>Impuestos</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in facturas %}
+            <tr>
+              <td>{{ f.fecha|date:'Y-m-d' }}</td>
+              <td>{{ f.folio }}</td>
+              <td>
+                {% if f.cliente %}
+                  {{ f.cliente.nombre }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ f.subtotal }}</td>
+              <td>{{ f.impuestos }}</td>
+              <td>{{ f.total }}</td>
+              <td>{{ f.estado|default:'-' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" style="text-align:right">Totales:</th>
+            <th>{{ totals.subtotal|default:0 }}</th>
+            <th>{{ totals.total_impuestos|default:0 }}</th>
+            <th>{{ totals.total_monto|default:0 }}</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <!-- Pagination controls -->
+    {% if page_obj and paginator.num_pages > 1 %}
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:8px;align-items:center;">
+        {% if page_obj.has_previous %}
+          <a class="btn" href="?{% if base_qs %}{{ base_qs }}&{% endif %}page=1">Primera</a>
+          <a class="btn" href="?{% if base_qs %}{{ base_qs }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="btn" href="?{% if base_qs %}{{ base_qs }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+          <a class="btn" href="?{% if base_qs %}{{ base_qs }}&{% endif %}page={{ paginator.num_pages }}">Última</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty-state"><p>No hay facturas para el periodo seleccionado.</p></div>
+  {% endif %}
+
+  <div style="text-align:right;margin-top:8px;"><a class="link" href="{% url 'facturacion:factura_list' %}">Volver a facturas</a></div>
+</div>
+{% endblock %}
