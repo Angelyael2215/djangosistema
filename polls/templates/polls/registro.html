@@ -2,136 +2,78 @@
 {% block title %}Registro de Trabajadores - Orticorp{% endblock %}
 
 {% block content %}
-<div class="card">
+<div class="card" style="max-width:900px;margin:28px auto;">
+    <h2 style="text-align:center;margin-bottom:12px;">Registrar Nuevo Trabajador</h2>
+    {% if messages %}
+        <div class="messages">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}</div>
+    {% endif %}
     <form method="post" action="{% url 'registro' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="form-section">
-            <div class="form-section-title">Datos Personales</div>
-            <div class="form-grid">
-                <div class="form-group"><label>ID No:</label><input type="text" name="id_no" placeholder=""></div>
-                <div class="form-group"><label>R.F.C:</label><input type="text" name="rfc" placeholder=""></div>
-                <div class="form-group"><label>No.exterior:</label><input type="text" name="no_exterior" placeholder=""></div>
-                <div class="form-group"><label>Nombre(S):</label><input type="text" name="nombre" placeholder=""></div>
-                <div class="form-group"><label>C.U.R.P:</label><input type="text" name="curp_text" placeholder=""></div>
-                <div class="form-group"><label>Código Postal:</label><input type="text" name="codigo_postal" placeholder=""></div>
-                <div class="form-group"><label>Apellido Paterno:</label><input type="text" name="apellido_paterno" placeholder=""></div>
-                <div class="form-group"><label>C.U.I.P:</label><input type="text" name="cuip_text" placeholder=""></div>
-                <div class="form-group"><label>Apellido Materno:</label><input type="text" name="apellido_materno" placeholder=""></div>
-                <div class="form-group"><label>Entidad Federativa:</label><input type="text" name="entidad_federativa" placeholder=""></div>
-                <div class="form-group"><label>Numero De Seguro Social (NSS):</label><input type="text" name="nss_text" placeholder=""></div>
-                <div class="form-group"><label>Calle:</label><input type="text" name="calle" placeholder=""></div>
+        
+        <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+            <legend style="font-weight:bold;padding:0 8px;">Información Personal</legend>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label for="nombre">Nombre:</label><input type="text" id="nombre" name="nombre" required></div>
+                <div class="form-group"><label for="apellido_paterno">Apellido Paterno:</label><input type="text" id="apellido_paterno" name="apellido_paterno"></div>
+                <div class="form-group"><label for="apellido_materno">Apellido Materno:</label><input type="text" id="apellido_materno" name="apellido_materno"></div>
+                <div class="form-group"><label for="id_no">ID No:</label><input type="text" id="id_no" name="id_no"></div>
             </div>
-        </div>
+        </fieldset>
 
-        <div class="form-section" style="margin-top:18px;">
-            <div class="form-section-title">Datos del Trabajador</div>
-            <div class="form-bottom-grid">
-                <div class="form-bottom-group"><label>Horario:</label>
-                    <select name="horario">
+        <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+            <legend style="font-weight:bold;padding:0 8px;">Documentos e Identificación</legend>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label for="rfc">R.F.C:</label><input type="text" id="rfc" name="rfc"></div>
+                <div class="form-group"><label for="curp_text">C.U.R.P:</label><input type="text" id="curp_text" name="curp_text"></div>
+                <div class="form-group"><label for="nss_text">Número De Seguro Social (NSS):</label><input type="text" id="nss_text" name="nss_text"></div>
+                <div class="form-group"><label for="cuip_text">C.U.I.P:</label><input type="text" id="cuip_text" name="cuip_text"></div>
+            </div>
+        </fieldset>
+
+        <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+            <legend style="font-weight:bold;padding:0 8px;">Dirección</legend>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label for="calle">Calle:</label><input type="text" id="calle" name="calle"></div>
+                <div class="form-group"><label for="no_exterior">No. Exterior:</label><input type="text" id="no_exterior" name="no_exterior"></div>
+                <div class="form-group"><label for="codigo_postal">Código Postal:</label><input type="text" id="codigo_postal" name="codigo_postal"></div>
+                <div class="form-group"><label for="entidad_federativa">Entidad Federativa:</label><input type="text" id="entidad_federativa" name="entidad_federativa"></div>
+            </div>
+        </fieldset>
+
+        <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+            <legend style="font-weight:bold;padding:0 8px;">Información de Servicio</legend>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label for="horario">Horario:</label>
+                    <select id="horario" name="horario">
                         <option value="06:00-14:00">06:00 am - 02:00 pm</option>
                         <option value="14:00-22:00">02:00 pm - 10:00 pm</option>
                         <option value="22:00-06:00">10:00 pm - 06:00 am</option>
                     </select>
                 </div>
-                <div class="form-bottom-group"><label>Calle Del Servicio:</label><input type="text" name="calle_servicio"></div>
-                <div class="form-bottom-group"><label>No.Exterior:</label><input type="text" name="no_exterior_servicio"></div>
-                <div class="form-bottom-group"><label>Entidad:</label><input type="text" name="entidad_servicio"></div>
-                <div class="form-bottom-group"><label>Estado:</label><input type="text" name="estado_servicio"></div>
+                <div class="form-group"><label for="calle_servicio">Calle Del Servicio:</label><input type="text" id="calle_servicio" name="calle_servicio"></div>
+                <div class="form-group"><label for="no_exterior_servicio">No. Exterior Servicio:</label><input type="text" id="no_exterior_servicio" name="no_exterior_servicio"></div>
+                <div class="form-group"><label for="entidad_servicio">Entidad Servicio:</label><input type="text" id="entidad_servicio" name="entidad_servicio"></div>
+                <div class="form-group"><label for="estado_servicio">Estado Servicio:</label><input type="text" id="estado_servicio" name="estado_servicio"></div>
             </div>
-        </div>
+        </fieldset>
 
-        <div class="form-section" style="margin-top:18px;">
-            <div class="form-section-title">Adjuntar Archivos</div>
-            <div class="upload-area">
-                <img src="https://cdn-icons-png.flaticon.com/512/60/60761.png" alt="Adjuntar">
-                <div class="upload-area-text">Adjunta los archivos aquí (RFC, CURP, etc.)</div>
-                <div style="width:100%; margin-top:12px; text-align:left;">
-                    <label>CUIP (archivo)</label><input type="file" name="cuip">
-                    <label>Antecedentes (archivo)</label><input type="file" name="antecedentes">
-                    <label>Situación Fiscal (archivo)</label><input type="file" name="situacion_fiscal">
-                    <label>CURP (archivo)</label><input type="file" name="curp">
-                    <label>NSS (archivo)</label><input type="file" name="nss">
-                    <label>Cursos (archivo)</label><input type="file" name="cursos">
-                    <label>Certificado de Estudios (archivo)</label><input type="file" name="certificado_estudios">
-                </div>
+        <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+            <legend style="font-weight:bold;padding:0 8px;">Adjuntar Archivos</legend>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label for="cuip">CUIP (archivo):</label><input type="file" id="cuip" name="cuip" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></div>
+                <div class="form-group"><label for="antecedentes">Antecedentes (archivo):</label><input type="file" id="antecedentes" name="antecedentes" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></div>
+                <div class="form-group"><label for="situacion_fiscal">Situación Fiscal (archivo):</label><input type="file" id="situacion_fiscal" name="situacion_fiscal" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></div>
+                <div class="form-group"><label for="curp">CURP (archivo):</label><input type="file" id="curp" name="curp" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></div>
+                <div class="form-group"><label for="nss">NSS (archivo):</label><input type="file" id="nss" name="nss" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></div>
+                <div class="form-group"><label for="cursos">Cursos (archivo):</label><input type="file" id="cursos" name="cursos" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></div>
+                <div class="form-group"><label for="certificado_estudios">Certificado de Estudios (archivo):</label><input type="file" id="certificado_estudios" name="certificado_estudios" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"></div>
             </div>
-            <div style="text-align:right;margin-top:10px;">
-                <button class="btn" type="submit">Registrar y Subir</button>
-            </div>
+        </fieldset>
+
+        <div style="display:flex;gap:12px;align-items:center;justify-content:flex-end;margin-top:12px;">
+            <a class="link" href="{% url 'inicio' %}">Volver al inicio</a>
+            <button class="btn" type="submit">Registrar y Subir</button>
         </div>
     </form>
 </div>
 {% endblock %}
-
-                    <div class="form-group">
-                        <label>Entidad Federativa:</label>
-                        <input type="text" name="entidad_federativa" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>Numero De Seguro Social (NSS):</label>
-                        <input type="text" name="nss_text" placeholder="Value">
-                    </div>
-                    <div class="form-group">
-                        <label>Calle:</label>
-                        <input type="text" name="calle" placeholder="Value">
-                    </div>
-                </div>
-        </section>
-        <section class="form-section-bottom">
-            <div class="form-bottom-left">
-                <div class="form-bottom-title">Datos del Trabajador</div>
-                        <div class="form-bottom-group">
-                            <label>Horario:</label>
-                            <select name="horario">
-                                <option value="06:00-14:00">06:00 am - 02:00 pm</option>
-                                <option value="14:00-22:00">02:00 pm - 10:00 pm</option>
-                                <option value="22:00-06:00">10:00 pm - 06:00 am</option>
-                            </select>
-                        </div>
-                        <div class="form-bottom-group">
-                            <label>Calle Del Servicio:</label>
-                            <input type="text" name="calle_servicio" placeholder="Calle del servicio">
-                        </div>
-                        <div class="form-bottom-group">
-                            <label>No.Exterior:</label>
-                            <input type="text" name="no_exterior_servicio" placeholder="No. exterior">
-                        </div>
-                        <div class="form-bottom-group">
-                            <label>Entidad:</label>
-                            <input type="text" name="entidad_servicio" placeholder="Entidad">
-                        </div>
-                        <div class="form-bottom-group">
-                            <label>Estado:</label>
-                            <input type="text" name="estado_servicio" placeholder="Estado">
-                        </div>
-            </div>
-            <div class="divider"></div>
-            <div class="form-bottom-right">
-                    <div class="form-bottom-title">Adjuntar Archivos</div>
-                    <div class="upload-area">
-                        <img src="https://cdn-icons-png.flaticon.com/512/60/60761.png" alt="Adjuntar">
-                        <div class="upload-area-text">Adjunta Los archivos aquí<br>(RFC, CURP, Etc...)</div>
-                        <div style="width:100%; margin-top:12px;">
-                            <label>CUIP (archivo)</label>
-                            <input type="file" name="cuip" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <label>Antecedentes (archivo)</label>
-                            <input type="file" name="antecedentes" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <label>Situación Fiscal (archivo)</label>
-                            <input type="file" name="situacion_fiscal" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <label>CURP (archivo)</label>
-                            <input type="file" name="curp" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <label>NSS (archivo)</label>
-                            <input type="file" name="nss" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <label>Cursos (archivo)</label>
-                            <input type="file" name="cursos" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <label>Certificado de Estudios (archivo)</label>
-                            <input type="file" name="certificado_estudios" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                        </div>
-                    </div>
-                    <button class="upload-btn" type="submit">Registrar y Subir</button>
-                </form>
-            </div>
-        </section>
-    </div>
-</body>
-</html>

@@ -2,18 +2,61 @@
 {% block title %}Registrar Trabajador - Orticorp{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width:700px;margin:28px auto;">
+<div class="card" style="max-width:900px;margin:28px auto;">
   <h2 style="text-align:center;margin-bottom:12px;">Registrar Nuevo Trabajador</h2>
   {% if messages %}
     <div class="messages">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}</div>
   {% endif %}
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <div class="form-group"><label for="nombre">Nombre:</label><input type="text" id="nombre" name="nombre" required></div>
-    <div class="form-group"><label for="apellido">Apellido:</label><input type="text" id="apellido" name="apellido" required></div>
-    <div class="form-group"><label for="estado">Estado:</label>
-      <select id="estado" name="estado"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option><option value="Licencia">Licencia</option></select>
-    </div>
+    
+    <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+      <legend style="font-weight:bold;padding:0 8px;">Información Personal</legend>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label for="nombre">Nombre:</label><input type="text" id="nombre" name="nombre" required></div>
+        <div class="form-group"><label for="apellido_paterno">Apellido Paterno:</label><input type="text" id="apellido_paterno" name="apellido_paterno"></div>
+        <div class="form-group"><label for="apellido_materno">Apellido Materno:</label><input type="text" id="apellido_materno" name="apellido_materno"></div>
+        <div class="form-group"><label for="estado">Estado:</label>
+          <select id="estado" name="estado">
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+            <option value="Licencia">Licencia</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+      <legend style="font-weight:bold;padding:0 8px;">Documentos e Identificación</legend>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label for="rfc">RFC:</label><input type="text" id="rfc" name="rfc"></div>
+        <div class="form-group"><label for="curp_text">CURP:</label><input type="text" id="curp_text" name="curp_text"></div>
+        <div class="form-group"><label for="nss_text">NSS:</label><input type="text" id="nss_text" name="nss_text"></div>
+        <div class="form-group"><label for="cuip_text">CUIP:</label><input type="text" id="cuip_text" name="cuip_text"></div>
+      </div>
+    </fieldset>
+
+    <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+      <legend style="font-weight:bold;padding:0 8px;">Dirección</legend>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label for="calle">Calle:</label><input type="text" id="calle" name="calle"></div>
+        <div class="form-group"><label for="no_exterior">No. Exterior:</label><input type="text" id="no_exterior" name="no_exterior"></div>
+        <div class="form-group"><label for="codigo_postal">Código Postal:</label><input type="text" id="codigo_postal" name="codigo_postal"></div>
+        <div class="form-group"><label for="entidad_federativa">Entidad Federativa:</label><input type="text" id="entidad_federativa" name="entidad_federativa"></div>
+      </div>
+    </fieldset>
+
+    <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
+      <legend style="font-weight:bold;padding:0 8px;">Información de Servicio</legend>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label for="horario">Horario:</label><input type="text" id="horario" name="horario"></div>
+        <div class="form-group"><label for="calle_servicio">Calle Servicio:</label><input type="text" id="calle_servicio" name="calle_servicio"></div>
+        <div class="form-group"><label for="no_exterior_servicio">No. Exterior Servicio:</label><input type="text" id="no_exterior_servicio" name="no_exterior_servicio"></div>
+        <div class="form-group"><label for="entidad_servicio">Entidad Servicio:</label><input type="text" id="entidad_servicio" name="entidad_servicio"></div>
+        <div class="form-group"><label for="estado_servicio">Estado Servicio:</label><input type="text" id="estado_servicio" name="estado_servicio"></div>
+      </div>
+    </fieldset>
+
     <div style="display:flex;gap:12px;align-items:center;justify-content:flex-end;margin-top:12px;">
       <a class="link" href="{% url 'inicio' %}">Volver al inicio</a>
       <button class="btn" type="submit">Registrar Trabajador</button>
