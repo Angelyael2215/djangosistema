@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-jva^4y&xiu^#=_yh+ryvb1o64xa_*2oi5xkt(t%9nslu1kgg31
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.165']
 
 
 # Application definition
@@ -79,14 +79,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'orticorpsystem',
-        'USER': 'root',
-        'PASSWORD': 'Montes11*',
-        'HOST': 'localhost',
+        'USER': 'Admin',
+        'PASSWORD': 'orticorp2209',
+        'HOST': '192.168.1.124',
         'PORT': '3306',
-          'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
     }
 }
 
