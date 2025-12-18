@@ -14,4 +14,9 @@ urlpatterns = [
     path('trabajador/<int:trabajador_id>/documentos/', views.agregar_documentos, name='agregar_documentos'),
     path('trabajador/<int:trabajador_id>/reactivar/', views.reactivar_trabajador, name='reactivar_trabajador'),
     path('auditoria/', views.historial_auditoria, name='historial_auditoria'),
+    # Horarios URLs
+    path('horarios/', views.horarios_list, name='horarios_list'),
+    path('horarios/agregar/', views.horarios_agregar, name='horarios_agregar'),
+    path('horarios/editar/<int:horario_id>/', views.horarios_editar, name='horarios_editar'),
+    path('horarios/eliminar/<int:horario_id>/', views.horarios_eliminar, name='horarios_eliminar'),
 ]

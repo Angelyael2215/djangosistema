@@ -49,7 +49,14 @@
     <fieldset style="border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:4px;">
       <legend style="font-weight:bold;padding:0 8px;">Información de Servicio</legend>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group"><label for="horario">Horario:</label><input type="text" id="horario" name="horario" value="{{ trabajador.horario }}"></div>
+        <div class="form-group"><label for="horario">Horario:</label>
+          <select id="horario" name="horario" class="form-control">
+            <option value="">-- Seleccionar horario --</option>
+            {% for horario in horarios %}
+              <option value="{{ horario.id }}" {% if trabajador.horario.id == horario.id %}selected{% endif %}>{{ horario.get_nombre_turno_display }} ({{ horario.hora_entrada }} - {{ horario.hora_salida }})</option>
+            {% endfor %}
+          </select>
+        </div>
         <div class="form-group"><label for="calle_servicio">Calle Servicio:</label><input type="text" id="calle_servicio" name="calle_servicio" value="{{ trabajador.calle_servicio }}"></div>
         <div class="form-group"><label for="no_exterior_servicio">No. Exterior Servicio:</label><input type="text" id="no_exterior_servicio" name="no_exterior_servicio" value="{{ trabajador.no_exterior_servicio }}"></div>
         <div class="form-group"><label for="entidad_servicio">Entidad Servicio:</label><input type="text" id="entidad_servicio" name="entidad_servicio" value="{{ trabajador.entidad_servicio }}"></div>

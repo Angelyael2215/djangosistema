@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from ..models import Trabajador, Servicio, Documentos, Horarios, Auditoria
 from ..models import CustomUser
-from ..forms import TrabajadorRegistroForm, DocumentosForm
+from ..forms import TrabajadorRegistroForm, DocumentosForm, HorariosForm
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 import os
@@ -239,11 +239,41 @@ def editar_trabajador(request, trabajador_id):
     if request.method == 'POST':
         trabajador.nombre = request.POST.get('nombre', trabajador.nombre)
         trabajador.apellido = request.POST.get('apellido', trabajador.apellido)
+        trabajador.apellido_materno = request.POST.get('apellido_materno', trabajador.apellido_materno)
+        trabajador.estado = request.POST.get('estado', trabajador.estado)
+        trabajador.rfc = request.POST.get('rfc', trabajador.rfc)
+        trabajador.curp_text = request.POST.get('curp_text', trabajador.curp_text)
+        trabajador.nss_text = request.POST.get('nss_text', trabajador.nss_text)
+        trabajador.cuip_text = request.POST.get('cuip_text', trabajador.cuip_text)
+        trabajador.calle = request.POST.get('calle', trabajador.calle)
+        trabajador.no_exterior = request.POST.get('no_exterior', trabajador.no_exterior)
+        trabajador.codigo_postal = request.POST.get('codigo_postal', trabajador.codigo_postal)
+        trabajador.entidad_federativa = request.POST.get('entidad_federativa', trabajador.entidad_federativa)
+        trabajador.calle_servicio = request.POST.get('calle_servicio', trabajador.calle_servicio)
+        trabajador.no_exterior_servicio = request.POST.get('no_exterior_servicio', trabajador.no_exterior_servicio)
+        trabajador.entidad_servicio = request.POST.get('entidad_servicio', trabajador.entidad_servicio)
+        trabajador.estado_servicio = request.POST.get('estado_servicio', trabajador.estado_servicio)
+        
+        # Convertir horario string/ID a objeto Horarios
+        horario_id = request.POST.get('horario')
+        if horario_id:
+            try:
+                trabajador.horario = Horarios.objects.get(id=int(horario_id))
+            except (Horarios.DoesNotExist, ValueError):
+                trabajador.horario = None
+        else:
+            trabajador.horario = None
+        
         trabajador.save()
         messages.success(request, f'Trabajador {trabajador.nombre} actualizado exitosamente.')
         return redirect('inicio')
     
-    return render(request, 'polls/editar_trabajador.html', {'trabajador': trabajador})
+    horarios = Horarios.objects.all().order_by('nombre_turno')
+    context = {
+        'trabajador': trabajador,
+        'horarios': horarios
+    }
+    return render(request, 'polls/editar_trabajador.html', context)
 
 @user_passes_test(is_hr_or_admin)
 def registrar_trabajador(request):
@@ -272,6 +302,14 @@ def registrar_trabajador(request):
             messages.error(request, 'El nombre es obligatorio.')
             return render(request, 'polls/registro.html')
 
+        # Convertir horario string/ID a objeto Horarios
+        horario_obj = None
+        if horario:
+            try:
+                horario_obj = Horarios.objects.get(id=int(horario))
+            except (Horarios.DoesNotExist, ValueError):
+                horario_obj = None
+
         trabajador = Trabajador.objects.create(
             nombre=nombre,
             apellido=apellido_paterno,
@@ -285,7 +323,7 @@ def registrar_trabajador(request):
             entidad_federativa=entidad_federativa,
             nss_text=nss_text,
             calle=calle,
-            horario=horario,
+            horario=horario_obj,
             calle_servicio=calle_servicio,
             no_exterior_servicio=no_exterior_servicio,
             entidad_servicio=entidad_servicio,
@@ -310,7 +348,12 @@ def registrar_trabajador(request):
         return redirect('inicio')
 
     # GET -> mostrar plantilla con diseño existente
-    return render(request, 'polls/registro.html')
+    # Obtener todos los horarios creados
+    horarios_unicos = Horarios.objects.all().order_by('nombre_turno')
+    context = {
+        'horarios': horarios_unicos
+    }
+    return render(request, 'polls/registro.html', context)
 
 @user_passes_test(is_hr_or_admin)
 def agregar_documentos(request, trabajador_id):
@@ -341,3 +384,73 @@ def agregar_documentos(request, trabajador_id):
         'documentos': documentos
     }
     return render(request, 'polls/agregar_documentos.html', context)
+
+# Vistas para gestión de horarios
+@user_passes_test(is_hr_or_admin)
+def horarios_list(request):
+    """Vista para listar todos los horarios generales disponibles"""
+    horarios = Horarios.objects.all().order_by('nombre_turno')
+    
+    context = {
+        'horarios': horarios,
+    }
+    return render(request, 'polls/horarios_list.html', context)
+
+@user_passes_test(is_hr_or_admin)
+def horarios_agregar(request):
+    """Vista para agregar un nuevo horario general"""
+    if request.method == 'POST':
+        form = HorariosForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Horario agregado exitosamente.')
+            return redirect('horarios_list')
+        else:
+            messages.error(request, 'Error al guardar el horario.')
+    else:
+        form = HorariosForm()
+    
+    context = {
+        'form': form,
+        'accion': 'Agregar'
+    }
+    return render(request, 'polls/horarios_form.html', context)
+
+@user_passes_test(is_hr_or_admin)
+def horarios_editar(request, horario_id):
+    """Vista para editar un horario existente"""
+    try:
+        horario = Horarios.objects.get(id=horario_id)
+    except Horarios.DoesNotExist:
+        messages.error(request, 'Horario no encontrado.')
+        return redirect('horarios_list')
+    
+    if request.method == 'POST':
+        form = HorariosForm(request.POST, instance=horario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Horario actualizado exitosamente.')
+            return redirect('horarios_list')
+        else:
+            messages.error(request, 'Error al actualizar el horario.')
+    else:
+        form = HorariosForm(instance=horario)
+    
+    context = {
+        'form': form,
+        'accion': 'Editar'
+    }
+    return render(request, 'polls/horarios_form.html', context)
+
+@user_passes_test(is_hr_or_admin)
+def horarios_eliminar(request, horario_id):
+    """Vista para eliminar un horario"""
+    try:
+        horario = Horarios.objects.get(id=horario_id)
+        nombre_turno = horario.get_nombre_turno_display()
+        horario.delete()
+        messages.success(request, f'Horario {nombre_turno} eliminado exitosamente.')
+    except Horarios.DoesNotExist:
+        messages.error(request, 'Horario no encontrado.')
+    
+    return redirect('horarios_list')

@@ -1,0 +1,84 @@
+{% extends 'polls/base.html' %}
+{% block title %}Gestión de Horarios - Orticorp{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Catálogo de Horarios</h2>
+    
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'horarios_agregar' %}" class="btn">+ Agregar Nuevo Horario</a>
+    </div>
+
+    <div class="table-container">
+        {% if horarios %}
+            <table id="horariosTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Turno</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for horario in horarios %}
+                        <tr>
+                            <td>{{ horario.id }}</td>
+                            <td><strong>{{ horario.get_nombre_turno_display }}</strong></td>
+                            <td>{{ horario.hora_entrada }}</td>
+                            <td>{{ horario.hora_salida }}</td>
+                            <td>
+                                <a href="{% url 'horarios_editar' horario.id %}" class="link-btn">Editar</a> | 
+                                <a href="{% url 'horarios_eliminar' horario.id %}" class="link-btn" onclick="return confirm('¿Está seguro de que desea eliminar este horario?')">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="text-align:center;padding:20px;background-color:#f9f9f9;border-radius:4px;">No hay horarios registrados. Crea el primero haciendo clic en "Agregar Nuevo Horario".</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.link-btn {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-btn:hover {
+    text-decoration: underline;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+}
+
+tr:hover {
+    background-color: #f9f9f9;
+}
+</style>
+{% endblock %}

@@ -28,6 +28,7 @@
                 <a class="nav-link" href="{% url 'inicio' %}">Inicio</a>
                 {% if can_edit %}
                     <a class="nav-link" href="{% url 'registrar_trabajador' %}">Registrar Trabajador</a>
+                    <a class="nav-link" href="{% url 'horarios_list' %}">Horarios</a>
                     <a class="nav-link" href="{% url 'baja' %}">Baja de Elementos</a>
                     <a class="nav-link" href="{% url 'facturacion:cliente_list' %}">Clientes</a>
                     <a class="nav-link" href="{% url 'facturacion:factura_list' %}">Facturación</a>

@@ -55,7 +55,7 @@
                     <td>{{ t.id }}</td>
                     <td>{{ t.nombre }}</td>
                     <td>{{ t.apellido }}{% if t.apellido_materno %} {{ t.apellido_materno }}{% endif %}</td>
-                    <td>{{ t.horario|default:'-' }}</td>
+                    <td>{{ t.get_horario_display }}</td>
                     <td>{{ t.fecha_ingreso|date:'d/m/Y' }}</td>
                     <td><span class="status-badge status-{{ t.estado|lower }}">{{ t.estado|default:'-' }}</span></td>
                     <td>

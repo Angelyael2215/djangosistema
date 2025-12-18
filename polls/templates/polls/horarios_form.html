@@ -1,0 +1,96 @@
+{% extends 'polls/base.html' %}
+{% block title %}{{ accion }} Horario - Orticorp{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:600px;margin:0 auto;">
+    <h2>{{ accion }} Horario</h2>
+
+    <form method="post" style="display:flex;flex-direction:column;gap:12px;">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div>
+            <label for="id_nombre_turno">{{ form.nombre_turno.label }}</label>
+            {{ form.nombre_turno }}
+            {% if form.nombre_turno.errors %}
+                <div class="alert alert-error" style="margin-top:5px;padding:5px;">
+                    {{ form.nombre_turno.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="id_hora_entrada">{{ form.hora_entrada.label }}</label>
+            {{ form.hora_entrada }}
+            {% if form.hora_entrada.errors %}
+                <div class="alert alert-error" style="margin-top:5px;padding:5px;">
+                    {{ form.hora_entrada.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="id_hora_salida">{{ form.hora_salida.label }}</label>
+            {{ form.hora_salida }}
+            {% if form.hora_salida.errors %}
+                <div class="alert alert-error" style="margin-top:5px;padding:5px;">
+                    {{ form.hora_salida.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:20px;">
+            <button type="submit" class="btn">{{ accion }} Horario</button>
+            <a href="{% url 'horarios_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #333;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+</style>
+{% endblock %}
+
