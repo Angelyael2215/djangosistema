@@ -43,6 +43,24 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
+class Horarios(models.Model):
+	TURNOS = (
+		('MATUTINO', 'Matutino'),
+		('VESPERTINO', 'Vespertino'),
+		('NOCTURNO', 'Nocturno'),
+	)
+	
+	nombre_turno = models.CharField(max_length=20, choices=TURNOS, blank=True, null=True)
+	hora_entrada = models.TimeField(blank=True, null=True)
+	hora_salida = models.TimeField(blank=True, null=True)
+
+	def __str__(self):
+		return f"{self.get_nombre_turno_display()} ({self.hora_entrada} - {self.hora_salida})"
+	
+	class Meta:
+		unique_together = ('nombre_turno',)
+		ordering = ['nombre_turno']
+
 class Trabajador(models.Model):
 	nombre = models.CharField(max_length=128)
 	# mantenemos `apellido` como apellido paterno para compatibilidad
@@ -56,7 +74,7 @@ class Trabajador(models.Model):
 	entidad_federativa = models.CharField(max_length=128, blank=True, null=True)
 	nss_text = models.CharField(max_length=128, blank=True, null=True)
 	calle = models.CharField(max_length=256, blank=True, null=True)
-	horario = models.CharField(max_length=64, blank=True, null=True)
+	horario = models.ForeignKey(Horarios, on_delete=models.SET_NULL, blank=True, null=True, related_name="trabajadores")
 	calle_servicio = models.CharField(max_length=256, blank=True, null=True)
 	no_exterior_servicio = models.CharField(max_length=64, blank=True, null=True)
 	entidad_servicio = models.CharField(max_length=128, blank=True, null=True)
@@ -66,6 +84,12 @@ class Trabajador(models.Model):
 
 	def __str__(self):
 		return f"{self.nombre} {self.apellido or ''}".strip()
+	
+	def get_horario_display(self):
+		"""Retorna el horario con horas de entrada y salida"""
+		if self.horario:
+			return f"{self.horario.hora_entrada} - {self.horario.hora_salida}"
+		return "-"
 
 class Servicio(models.Model):
 	trabajador = models.ForeignKey(Trabajador, on_delete=models.CASCADE, related_name="servicios")
@@ -89,16 +113,6 @@ class Documentos(models.Model):
 
 	def __str__(self):
 		return f"Documentos de {self.trabajador}"
-
-class Horarios(models.Model):
-	trabajador = models.ForeignKey(Trabajador, on_delete=models.CASCADE, related_name="horarios")
-	hora = models.CharField(max_length=128)
-	dia = models.CharField(max_length=128)
-	mes = models.CharField(max_length=128)
-	anio = models.CharField(max_length=128)
-
-	def __str__(self):
-		return f"Horario de {self.trabajador}: {self.hora}, {self.dia}/{self.mes}/{self.anio}"
 
 class 	Auditoria(models.Model):
 	"""Registra cambios de estado en trabajadores"""
