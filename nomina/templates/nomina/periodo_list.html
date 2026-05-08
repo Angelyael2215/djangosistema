@@ -1,0 +1,69 @@
+{% extends 'polls/base.html' %}
+
+{% block title %}Períodos de Nómina{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Períodos de Nómina</h1>
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <a href="{% url 'nomina:periodo_create' %}" class="btn btn-primary">Crear Nuevo Período</a>
+        <a href="{% url 'nomina:salario_list' %}" class="btn btn-secondary">Gestionar Salarios</a>
+    </div>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-control">
+                <option value="abierto" {% if filtros.estado == 'abierto' %}selected{% endif %}>Abiertos</option>
+                <option value="cerrado" {% if filtros.estado == 'cerrado' %}selected{% endif %}>Cerrados</option>
+                <option value="todos" {% if filtros.estado == 'todos' %}selected{% endif %}>Todos</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Tipo de Período</label>
+            <select name="tipo" class="form-control">
+                <option value="" {% if not filtros.tipo %}selected{% endif %}>Todos</option>
+                <option value="SEMANAL" {% if filtros.tipo == 'SEMANAL' %}selected{% endif %}>Semanal</option>
+                <option value="QUINCENAL" {% if filtros.tipo == 'QUINCENAL' %}selected{% endif %}>Quincenal</option>
+                <option value="MENSUAL" {% if filtros.tipo == 'MENSUAL' %}selected{% endif %}>Mensual</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Buscar descripción</label>
+            <input type="text" name="buscar" class="form-control" value="{{ filtros.buscar }}" placeholder="Ej. Abril 2024">
+        </div>
+        <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-outline-primary w-100">Filtrar</button>
+        </div>
+    </form>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for periodo in periodos %}
+            <tr>
+                <td>{{ periodo.get_tipo_periodo_display }}</td>
+                <td>{{ periodo.fecha_inicio }}</td>
+                <td>{{ periodo.fecha_fin }}</td>
+                <td>{% if periodo.cerrado %}Cerrado{% else %}Abierto{% endif %}</td>
+                <td>
+                    <a href="{% url 'nomina:periodo_detail' periodo.pk %}" class="btn btn-sm btn-info">Ver</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No hay períodos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

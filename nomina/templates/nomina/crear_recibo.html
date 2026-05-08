@@ -1,0 +1,161 @@
+{% extends 'polls/base.html' %}
+
+{% block title %}Crear Recibo de Pago{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Crear Recibo de Pago</h1>
+    <p><strong>Trabajador:</strong> {{ trabajador.nombre }} {{ trabajador.apellido }}</p>
+    <p><strong>Período:</strong> {{ periodo }}</p>
+
+    {% if tiene_salario %}
+        <div class="alert alert-info">
+            El trabajador ya tiene salario asignado.
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            Este trabajador no tiene salario asignado. Ingresa el salario diario en el formulario para guardarlo.
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <h4>Salario y Puesto</h4>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="salario_diario" class="form-label">Salario Diario</label>
+                    <input type="number" step="0.01" class="form-control" id="salario_diario" name="salario_diario" placeholder="Ej. 200.00">
+                    <div class="form-text">Si no tiene salario asignado, se guardará aquí.</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="puesto" class="form-label">Puesto</label>
+                    <input type="text" class="form-control" id="puesto" name="puesto" placeholder="Ej. Guardía nocturno">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="lugar_servicio" class="form-label">Lugar del servicio</label>
+                    <input type="text" class="form-control" id="lugar_servicio" name="lugar_servicio" placeholder="Ej. Plaza central">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="horario_turno" class="form-label">Horario del Turno</label>
+                    <input type="text" class="form-control" id="horario_turno" name="horario_turno" placeholder="Ej. 20:00 - 06:00">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="horas_por_turno" class="form-label">Horas por Turno</label>
+                    <input type="number" step="0.5" class="form-control" id="horas_por_turno" name="horas_por_turno" placeholder="Ej. 8">
+                </div>
+            </div>
+        </div>
+
+        <h4>Datos de Asistencia</h4>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="dias_trabajados" class="form-label">Días Trabajados</label>
+                    <input type="number" step="0.5" class="form-control" id="dias_trabajados" name="dias_trabajados" required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="horas_extras" class="form-label">Horas Extras</label>
+                    <input type="number" step="0.5" class="form-control" id="horas_extras" name="horas_extras" value="0">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="retardos" class="form-label">Número de Retardos</label>
+                    <input type="number" class="form-control" id="retardos" name="retardos" value="0">
+                </div>
+            </div>
+        </div>
+
+        <h4>Bonos y Percepciones</h4>
+        <div id="percepciones">
+            <div class="percepcion-row mb-3 border p-3 rounded">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-control" name="tipo_percepcion[]">
+                            <option value="">Seleccionar...</option>
+                            <option value="BONO">Bono</option>
+                            <option value="HORAS_EXTRA">Horas Extra</option>
+                            <option value="VACACIONES">Vacaciones</option>
+                            <option value="OTROS">Otros</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Descripción</label>
+                        <input type="text" class="form-control" name="descripcion_percepcion[]" placeholder="Descripción del bono">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Monto</label>
+                        <input type="number" step="0.01" class="form-control" name="monto_percepcion[]" placeholder="0.00">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm mb-4" onclick="agregarPercepcion()">+ Agregar Percepción</button>
+
+        <h4>Descuentos Adicionales</h4>
+        <div id="deducciones">
+            <div class="deduccion-row mb-3 border p-3 rounded">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-control" name="tipo_deduccion[]">
+                            <option value="">Seleccionar...</option>
+                            <option value="PRESTAMO">Préstamo</option>
+                            <option value="FALTAS">Faltas</option>
+                            <option value="OTROS">Otros</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Descripción</label>
+                        <input type="text" class="form-control" name="descripcion_deduccion[]" placeholder="Descripción del descuento">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Monto</label>
+                        <input type="number" step="0.01" class="form-control" name="monto_deduccion[]" placeholder="0.00">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-danger btn-sm mb-4" onclick="agregarDeduccion()">+ Agregar Descuento</button>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Crear Recibo</button>
+            <a href="{% url 'nomina:periodo_detail' periodo.pk %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function agregarPercepcion() {
+    const container = document.getElementById('percepciones');
+    const row = container.querySelector('.percepcion-row').cloneNode(true);
+    row.querySelectorAll('input').forEach(input => input.value = '');
+    row.querySelector('select').value = '';
+    container.appendChild(row);
+}
+
+function agregarDeduccion() {
+    const container = document.getElementById('deducciones');
+    const row = container.querySelector('.deduccion-row').cloneNode(true);
+    row.querySelectorAll('input').forEach(input => input.value = '');
+    row.querySelector('select').value = '';
+    container.appendChild(row);
+}
+</script>
+{% endblock %}

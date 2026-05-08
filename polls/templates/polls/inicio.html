@@ -1,45 +1,119 @@
 {% extends 'polls/base.html' %}
-{% block title %}Inicio - Orticorp{% endblock %}
+
+{% block title %}
+ORTICORP
+{% endblock %}
 
 {% block content %}
+
 <div class="card">
-    <form method="get" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:180px;">
-            <label for="q">Buscar</label>
-            <input id="q" name="q" type="text" value="{{ request.GET.q|default:filters.q|default:'' }}" placeholder="Nombre, apellido o CURP" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+
+    <form method="get" class="filter-form">
+
+        <div class="form-field">
+
+            <label for="q">
+                Buscar
+            </label>
+
+            <input
+                id="q"
+                name="q"
+                type="text"
+
+                value="{{ request.GET.q|default:filters.q|default:'' }}"
+
+                placeholder="Nombre, apellido o CURP"
+            >
+
         </div>
 
-        <div style="width:150px;">
-            <label for="estado">Estado</label>
-            <select id="estado" name="estado" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
-                <option value="">-- Todos --</option>
-                <option value="Activo" {% if request.GET.estado == 'Activo' or filters.estado == 'Activo' %}selected{% endif %}>Activo</option>
-                <option value="Inactivo" {% if request.GET.estado == 'Inactivo' or filters.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+        <div class="small-field">
+
+            <label for="estado">
+                Estado
+            </label>
+
+            <select id="estado" name="estado">
+
+                <option value="">
+                    -- Todos --
+                </option>
+
+                <option value="Activo"
+                {% if request.GET.estado == 'Activo' or filters.estado == 'Activo' %}
+                selected
+                {% endif %}
+                >
+                    Activo
+                </option>
+
+                <option value="Inactivo"
+                {% if request.GET.estado == 'Inactivo' or filters.estado == 'Inactivo' %}
+                selected
+                {% endif %}
+                >
+                    Inactivo
+                </option>
+
             </select>
+
         </div>
 
-        <div style="width:170px;">
-            <label for="from_date">Desde</label>
-            <input id="from_date" name="from_date" type="date" value="{{ request.GET.from_date|default:filters.from_date|default:'' }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+        <div class="small-field">
+
+            <label for="from_date">
+                Desde
+            </label>
+
+            <input
+                id="from_date"
+                name="from_date"
+                type="date"
+
+                value="{{ request.GET.from_date|default:filters.from_date|default:'' }}"
+            >
+
         </div>
 
-        <div style="width:170px;">
-            <label for="to_date">Hasta</label>
-            <input id="to_date" name="to_date" type="date" value="{{ request.GET.to_date|default:filters.to_date|default:'' }}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;">
+        <div class="small-field">
+
+            <label for="to_date">
+                Hasta
+            </label>
+
+            <input
+                id="to_date"
+                name="to_date"
+                type="date"
+
+                value="{{ request.GET.to_date|default:filters.to_date|default:'' }}"
+            >
+
         </div>
 
-        <div style="display:flex;gap:8px;">
-            <button type="submit" class="btn btn-filter">Aplicar</button>
-            <a class="btn btn-reset" href="{% url 'inicio' %}">Limpiar</a>
+        <div style="display:flex;gap:10px;">
+
+            <button type="submit" class="btn btn-filter">
+                Aplicar
+            </button>
+
+            <a class="btn btn-reset" href="{% url 'inicio' %}">
+                Limpiar
+            </a>
+
         </div>
+
     </form>
 
-    
-
     <div class="table-container">
+
         <table id="dataTable">
+
             <thead>
+
                 <tr>
+
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Apellidos</th>
@@ -47,29 +121,85 @@
                     <th>Fecha Ingreso</th>
                     <th>Estado</th>
                     <th>Acciones</th>
+
                 </tr>
+
             </thead>
+
             <tbody>
+
                 {% for t in trabajadores %}
+
                 <tr>
+
                     <td>{{ t.id }}</td>
+
                     <td>{{ t.nombre }}</td>
-                    <td>{{ t.apellido }}{% if t.apellido_materno %} {{ t.apellido_materno }}{% endif %}</td>
-                    <td>{{ t.get_horario_display }}</td>
-                    <td>{{ t.fecha_ingreso|date:'d/m/Y' }}</td>
-                    <td><span class="status-badge status-{{ t.estado|lower }}">{{ t.estado|default:'-' }}</span></td>
+
                     <td>
-                        <a class="link" href="{% url 'agregar_documentos' t.id %}">Documentos</a>
-                        {% if can_edit %} |
-                        <a class="link" href="{% url 'editar_trabajador' t.id %}">Editar</a>
+                        {{ t.apellido }}
+
+                        {% if t.apellido_materno %}
+                            {{ t.apellido_materno }}
                         {% endif %}
                     </td>
+
+                    <td>
+                        {{ t.get_horario_display }}
+                    </td>
+
+                    <td>
+                        {{ t.fecha_ingreso|date:'d/m/Y' }}
+                    </td>
+
+                    <td>
+
+                        <span class="status-badge status-{{ t.estado|lower }}">
+                            {{ t.estado|default:'-' }}
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <a class="link"
+                        href="{% url 'agregar_documentos' t.id %}">
+                            Documentos
+                        </a>
+
+                        {% if can_edit %}
+
+                            |
+
+                            <a class="link"
+                            href="{% url 'editar_trabajador' t.id %}">
+                                Editar
+                            </a>
+
+                        {% endif %}
+
+                    </td>
+
                 </tr>
+
                 {% empty %}
-                <tr><td colspan="7">No hay trabajadores registrados.</td></tr>
+
+                <tr>
+
+                    <td colspan="7">
+                        No hay trabajadores registrados.
+                    </td>
+
+                </tr>
+
                 {% endfor %}
+
             </tbody>
+
         </table>
+
     </div>
+
 </div>
+
 {% endblock %}

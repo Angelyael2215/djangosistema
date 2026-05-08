@@ -1,0 +1,62 @@
+{% extends 'polls/base.html' %}
+
+{% block title %}Salarios Base{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Salarios Base de Trabajadores</h1>
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <a href="{% url 'nomina:salario_create' %}" class="btn btn-primary">Asignar Salario</a>
+        <a href="{% url 'nomina:periodo_list' %}" class="btn btn-secondary">Volver a Nómina</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Trabajadores con Salario Asignado</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Trabajador</th>
+                        <th>Salario Diario</th>
+                        <th>Salario Mensual</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for salario in salarios %}
+                    <tr>
+                        <td>{{ salario.trabajador.nombre }} {{ salario.trabajador.apellido }}</td>
+                        <td>${{ salario.salario_diario }}</td>
+                        <td>${{ salario.salario_mensual }}</td>
+                        <td>{% if salario.activo %}Activo{% else %}Inactivo{% endif %}</td>
+                        <td>
+                            <a href="{% url 'nomina:salario_edit' salario.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No hay salarios asignados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <h4>Trabajadores sin Salario</h4>
+            {% if trabajadores_sin_salario %}
+                <div class="list-group">
+                    {% for trabajador in trabajadores_sin_salario %}
+                    <a href="{% url 'nomina:salario_create_trabajador' trabajador.pk %}" class="list-group-item list-group-item-action">
+                        {{ trabajador.nombre }} {{ trabajador.apellido }}
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Todos los trabajadores tienen salario asignado.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

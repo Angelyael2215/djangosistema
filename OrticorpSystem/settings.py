@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'OrticorpSystem',
     'polls',
     'facturacion',
+    'nomina',
 ]
 
 MIDDLEWARE = [
@@ -77,12 +78,8 @@ WSGI_APPLICATION = 'OrticorpSystem.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'orticorpsystem',
-        'USER': 'Admin',
-        'PASSWORD': 'orticorp2209',
-        'HOST': '192.168.1.124',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

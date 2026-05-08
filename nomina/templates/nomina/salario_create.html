@@ -1,0 +1,68 @@
+{% extends 'polls/base.html' %}
+
+{% block title %}Asignar Salario Base{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% if salario %}Editar Salario{% else %}Asignar Salario Base{% endif %}</h1>
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+
+        {% if trabajador %}
+            <div class="alert alert-info">
+                Trabajador: <strong>{{ trabajador.nombre }} {{ trabajador.apellido }}</strong>
+                <input type="hidden" name="trabajador" value="{{ trabajador.pk }}">
+            </div>
+        {% else %}
+            <div class="mb-3">
+                <label for="trabajador" class="form-label">Seleccionar Trabajador</label>
+                <select class="form-control" id="trabajador" name="trabajador" required>
+                    <option value="">Seleccionar trabajador...</option>
+                    {% for t in trabajadores %}
+                    <option value="{{ t.pk }}">{{ t.nombre }} {{ t.apellido }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="salario_diario" class="form-label">Salario Diario</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" class="form-control" id="salario_diario" name="salario_diario" required value="{% if salario %}{{ salario.salario_diario }}{% endif %}">
+                    </div>
+                    <div class="form-text">El salario mensual se calculará automáticamente (diario × 30).</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="salario_calculado" class="form-label">Salario Mensual Calculado</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" class="form-control" id="salario_calculado" readonly value="{% if salario %}{{ salario.salario_mensual }}{% endif %}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">{% if salario %}Actualizar Salario{% else %}Guardar Salario{% endif %}</button>
+            <a href="{% url 'nomina:salario_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+const salarioDiario = document.getElementById('salario_diario');
+const salarioCalculado = document.getElementById('salario_calculado');
+if (salarioDiario) {
+    salarioDiario.addEventListener('input', function() {
+        const diario = parseFloat(this.value) || 0;
+        salarioCalculado.value = (diario * 30).toFixed(2);
+    });
+}
+</script>
+{% endblock %}

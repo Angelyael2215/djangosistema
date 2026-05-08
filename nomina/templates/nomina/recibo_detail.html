@@ -1,0 +1,134 @@
+{% extends 'polls/base.html' %}
+
+{% block title %}Recibo de Pago{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Recibo de Pago</h1>
+    <div class="mb-3">
+        <a href="{% url 'nomina:recibo_pdf' recibo.pk %}" class="btn btn-sm btn-primary">Descargar PDF</a>
+        <a href="{% url 'nomina:periodo_detail' recibo.periodo.pk %}" class="btn btn-sm btn-secondary">Volver al Período</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Datos del servicio</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Puesto:</strong> {{ recibo.puesto|default:'-' }}</p>
+                    <p><strong>Lugar:</strong> {{ recibo.lugar_servicio|default:'-' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Horario del turno:</strong> {{ recibo.horario_turno|default:'-' }}</p>
+                    <p><strong>Horas por turno:</strong> {{ recibo.horas_por_turno }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Datos de asistencia</h5>
+                    <p><strong>Días trabajados:</strong> {{ recibo.dias_trabajados }}</p>
+                    <p><strong>Horas extras:</strong> {{ recibo.horas_extras }}</p>
+                    <p><strong>Retardos:</strong> {{ recibo.retardos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5>Resumen financiero</h5>
+                    <p><strong>Total percepciones:</strong> ${{ recibo.total_percepciones }}</p>
+                    <p><strong>Total deducciones:</strong> ${{ recibo.total_deducciones }}</p>
+                    <p class="h4 text-success"><strong>Neto a pagar: ${{ recibo.neto_pagar }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Percepciones detalladas</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Salario días trabajados</td>
+                        <td>${{ salario_dias }}</td>
+                    </tr>
+                    <tr>
+                        <td>Horas extras</td>
+                        <td>${{ horas_extras }}</td>
+                    </tr>
+                    {% for percepcion in recibo.percepciones.all %}
+                    <tr>
+                        <td>{{ percepcion.descripcion }}</td>
+                        <td>${{ percepcion.monto }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-active">
+                        <td><strong>Total Percepciones</strong></td>
+                        <td><strong>${{ recibo.total_percepciones }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h5>Deducciones detalladas</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Retardos</td>
+                        <td>${{ retardos }}</td>
+                    </tr>
+                    <tr>
+                        <td>ISR (10%)</td>
+                        <td>${{ impuestos.isr }}</td>
+                    </tr>
+                    <tr>
+                        <td>IMSS (7.5%)</td>
+                        <td>${{ impuestos.imss }}</td>
+                    </tr>
+                    <tr>
+                        <td>Pensión (1.125%)</td>
+                        <td>${{ impuestos.pension }}</td>
+                    </tr>
+                    {% for deduccion in recibo.deducciones.all %}
+                    <tr>
+                        <td>{{ deduccion.descripcion }}</td>
+                        <td>${{ deduccion.monto }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-active">
+                        <td><strong>Total Deducciones</strong></td>
+                        <td><strong>${{ recibo.total_deducciones }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if recibo.notas %}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5>Notas</h5>
+            <p>{{ recibo.notas }}</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

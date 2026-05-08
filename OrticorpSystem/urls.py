@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', include('polls.urls')),  # Todas las rutas de polls
     path('facturacion/', include('facturacion.urls')),
+    path('nomina/', include('nomina.urls')),
     path('admin/', admin.site.urls),
 ]
 
